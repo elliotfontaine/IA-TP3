@@ -37,19 +37,40 @@ def load_iris_dataset(train_ratio):
     
     # TODO : le code ici pour lire le dataset
     
-    # REMARQUE très importante : 
-	# remarquez bien comment les exemples sont ordonnés dans 
-    # le fichier du dataset, ils sont ordonnés par type de fleur, cela veut dire que 
-    # si vous lisez les exemples dans cet ordre et que si par exemple votre ration est de 60%,
-    # vous n'allez avoir aucun exemple du type Iris-virginica pour l'entrainement, pensez
-    # donc à utiliser la fonction random.shuffle pour melanger les exemples du dataset avant de séparer
-    # en train et test.
-       
+    train_ratio = float(train_ratio)
+    if train_ratio < 0 or train_ratio > 1:
+      raise ValueError('Le ratio doit être compris entre 0 et 1')
+    
+    # Lecture des exemples et de leurs étiquettes.
+    examples = []
+    labels = []
+    for line in f:
+        data = line.strip().split(',')
+        if len(data) == 5:
+            example = [float(data[i]) for i in range(4)]
+            label = conversion_labels[data[4]]
+            examples.append(example)
+            labels.append(label)
+        else:
+            raise IOError('Le fichier du dataset est corrompu')
+    f.close()
+
+    # Mélange des exemples.
+    data = list(zip(examples, labels))
+    random.shuffle(data)
+    examples, labels = zip(*data)
+
+    # Calcul du nombre d'exemples à utiliser pour l'entrainement.
+    n_train_examples = int(len(examples) * train_ratio)
+
+    # Création des matrices de train et test.
+    train = np.array(examples[:n_train_examples])
+    train_labels = np.array(labels[:n_train_examples])
+    test = np.array(examples[n_train_examples:])
+    test_labels = np.array(labels[n_train_examples:])
     
     # Tres important : la fonction doit retourner 4 matrices (ou vecteurs) de type Numpy. 
     return (train, train_labels, test, test_labels)
-	
-	
 	
 def load_wine_dataset(train_ratio):
     """Cette fonction a pour but de lire le dataset Binary Wine quality
