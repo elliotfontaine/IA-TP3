@@ -29,3 +29,5 @@ A partir de la matrice de confusion, il est possible de calculer plusieurs mesur
 - L'exactitude (Accuracy) est définie comme le rapport entre le nombre de prédictions correctes (TP + TN) et le nombre total d'exemples (TP + FP + TN + FN) : Accuracy = (TP + TN) / (TP + FP + TN + FN). L'exactitude mesure la proportion d'exemples correctement classés par le modèle.
 - La précision et le rappel peuvent être calculés à partir des cellules de la matrice de confusion : Precision = TP / (TP + FP) et Recall = TP / (TP + FN).
 - Enfin, si on peut calculer la précision et le rappel, le F1-score peut donc également être calculé à partir des cellules de la matrice de confusion.
+
+De plus, on pourrait rajouter la Spécificité = VN / (VN + FP). Cette dernière métrique n'est pas très utilisée en machine learning, mais elle est très importante en épidémiologie ou lors des tests cliniques, autre domaine d'utilisation des matrices de confusion.

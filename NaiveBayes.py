@@ -1,6 +1,6 @@
 """
 Vous allez definir une classe pour chaque algorithme que vous allez développer,
-votre classe doit contenit au moins les 3 méthodes definies ici bas, 
+votre classe doit contenir au moins les 3 méthodes definies ici bas, 
 	* train 	: pour entrainer le modèle sur l'ensemble d'entrainement.
 	* predict 	: pour prédire la classe d'un exemple donné.
 	* evaluate 		: pour evaluer le classifieur avec les métriques demandées. 

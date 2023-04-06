@@ -99,7 +99,8 @@ def load_abalone_dataset(train_ratio):
 
 def _load_dataset(filename, train_ratio, lenght_data):
   """
-  Cette fonction privée a pour but de lire un dataset
+  Cette fonction privée a pour but de lire un dataset. Elle est appelée par les fonctions load_iris_dataset,
+  load_wine_dataset, et load_abalone_dataset.
 
   Args:
       filename: le chemin vers le fichier du dataset.
@@ -108,7 +109,19 @@ def _load_dataset(filename, train_ratio, lenght_data):
       lenght_data: la nombre de colonnes dans le dataset. On suppose que les labels sont dans la dernière colonne.
       
   Retours:
-  
+        Cette fonction doit retourner 4 matrices de type Numpy: train, train_labels, test, et test_labels
+
+        - train : une matrice numpy qui contient les exemples qui vont etre utilisés pour l'entrainement, chaque 
+        ligne dans cette matrice représente un exemple d'entrainement.
+
+        - train_labels : contient les labels (ou les étiquettes) pour chaque exemple dans train, de telle sorte
+          que : train_labels[i] est l'etiquette pour l'exemple train[i]
+
+        - test : une matrice numpy qui contient les exemples qui vont etre utilisés pour le test, chaque 
+        ligne dans cette matrice représente un exemple de test.
+
+        - test_labels : contient les étiquettes pour chaque exemple dans test, de telle sorte
+          que : test_labels[i] est l'etiquette pour l'exemple test[i]
   """
   
   random.seed(1) # Pour avoir les meme nombres aléatoires à chaque initialisation.
