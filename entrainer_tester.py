@@ -18,7 +18,7 @@ En gros, vous allez :
 """
 
 # Initialisez vos paramètres
-
+TRAIN_RATIO = 0.8
 
 
 
@@ -30,7 +30,10 @@ En gros, vous allez :
 
 
 # Charger/lire les datasets
-
+keys = ['train', 'train_labels', 'test', 'test_labels']
+iris = dict(zip(keys, load_datasets.load_iris_dataset(TRAIN_RATIO)))
+wine = dict(zip(keys, load_datasets.load_wine_dataset(TRAIN_RATIO)))
+abalone = dict(zip(keys, load_datasets.load_abalone_dataset(TRAIN_RATIO)))
 
 
 

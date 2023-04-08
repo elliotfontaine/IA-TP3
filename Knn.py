@@ -12,7 +12,6 @@ import numpy as np
 
 
 # le nom de votre classe
-# BayesNaif pour le modèle bayesien naif
 # Knn pour le modèle des k plus proches voisins
 
 class Knn: #nom de la class à changer
@@ -30,7 +29,7 @@ class Knn: #nom de la class à changer
 		C'est la méthode qui va entrainer votre modèle,
 		train est une matrice de type Numpy et de taille nxm, avec 
 		n : le nombre d'exemple d'entrainement dans le dataset
-		m : le mobre d'attribus (le nombre de caractéristiques)
+		m : le nombre d'attributs (le nombre de caractéristiques)
 		
 		train_labels : est une matrice numpy de taille nx1
 		
