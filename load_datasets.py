@@ -63,6 +63,7 @@ def load_wine_dataset(train_ratio):
 	
     train, train_labels, test, test_labels = _load_dataset('datasets/binary-winequality-white.csv', train_ratio, 12)
     train, test = train.astype(float), test.astype(float)
+    train_labels, test_labels = train_labels.astype(int), test_labels.astype(int)
     
     # La fonction doit retourner 4 structures de données de type Numpy.
     return (train, train_labels, test, test_labels)
