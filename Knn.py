@@ -16,14 +16,17 @@ import numpy as np
 
 class Knn: #nom de la class à changer
 
-	def __init__(self, **kwargs):
+	def __init__(self, k=5):
 		"""
 		C'est un Initializer. 
 		Vous pouvez passer d'autre paramètres au besoin,
 		c'est à vous d'utiliser vos propres notations
 		"""
-		
-		
+		self.k = k
+		self.train_data = None
+		self.train_labels = None
+        
+        
 	def train(self, train, train_labels): #vous pouvez rajouter d'autres attributs au besoin
 		"""
 		C'est la méthode qui va entrainer votre modèle,
@@ -37,14 +40,25 @@ class Knn: #nom de la class à changer
 		les expliquer en commentaire
 		
 		"""
-        
-	def predict(self, x):
+		self.train_data = train
+		self.train_labels = train_labels
+    
+	def predict(self, x, distance_type='euclidean'):
 		"""
 		Prédire la classe d'un exemple x donné en entrée
 		exemple est de taille 1xm
 		"""
+		if distance_type == 'euclidean':
+			distances = np.sqrt(np.sum((self.train_data - x)**2, axis=1))
+		elif distance_type == 'manhattan':
+			distances = np.sum(np.abs(self.train_data - x), axis=1)
+		else:
+			raise ValueError('Distance type not recognized')
+		k_nearest = np.argsort(distances)[:self.k]
+		k_nearest_labels = self.train_labels[k_nearest]
+		return (np.bincount(k_nearest_labels)).argmax()
         
-	def evaluate(self, X, y):
+	def evaluate(self, X, y, labels, distance_type='euclidean'):
 		"""
 		c'est la méthode qui va evaluer votre modèle sur les données X
 		l'argument X est une matrice de type Numpy et de taille nxm, avec 
@@ -56,6 +70,13 @@ class Knn: #nom de la class à changer
 		vous pouvez rajouter d'autres arguments, il suffit juste de
 		les expliquer en commentaire
 		"""
+		confusion_matrix = {l: {l: 0 for l in labels} for l in labels}
+		for i in range(len(X)):
+			prediction = self.predict(X[i], distance_type)
+			confusion_matrix[prediction][y[i]] += 1
+		return confusion_matrix
+		
+
         
 	
 	# Vous pouvez rajouter d'autres méthodes et fonctions,
