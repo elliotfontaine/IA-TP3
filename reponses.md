@@ -31,3 +31,7 @@ A partir de la matrice de confusion, il est possible de calculer plusieurs mesur
 - Enfin, si on peut calculer la précision et le rappel, le F1-score peut donc également être calculé à partir des cellules de la matrice de confusion.
 
 De plus, on pourrait rajouter la Spécificité = VN / (VN + FP). Cette dernière métrique n'est pas très utilisée en machine learning, mais elle est très importante en épidémiologie ou lors des tests cliniques, autre domaine d'utilisation des matrices de confusion.
+
+Pour les problèmes multi-classes (plus de labels que simplement Positif et Négatif), chacune de ces statistiques se voit redéfinie en plusieurs versions: précision de classe, macro-précision, et précision pondérée. Les définitions sont celle présentées ici
+https://towardsdatascience.com/multi-class-metrics-made-simple-part-i-precision-and-recall-9250280bddc2
+https://towardsdatascience.com/multi-class-metrics-made-simple-part-ii-the-f1-score-ebe8b2c2ca1

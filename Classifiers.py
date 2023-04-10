@@ -9,22 +9,67 @@ se fera en utilisant les méthodes train, predict et evaluate de votre code.
 """
 
 import numpy as np
-
+from abc import ABC, abstractmethod
 
 # le nom de votre classe
+# BayesNaif pour le modèle bayesien naif
 # Knn pour le modèle des k plus proches voisins
 
-class Knn: #nom de la class à changer
+class Classifier(ABC): #nom de la class à changer
+	
+	@abstractmethod
+	def train(self, train, train_labels): #vous pouvez rajouter d'autres attributs au besoin
+		"""
+		C'est la méthode qui va entrainer votre modèle,
+		train est une matrice de type Numpy et de taille nxm, avec 
+		n : le nombre d'exemple d'entrainement dans le dataset
+		m : le mobre d'attribus (le nombre de caractéristiques)
+		
+		train_labels : est une matrice numpy de taille nx1
+		
+		vous pouvez rajouter d'autres arguments, il suffit juste de
+		les expliquer en commentaire
+		
+		"""
+		pass
+    
+	@abstractmethod
+	def predict(self, x):
+		"""
+		Prédire la classe d'un exemple x donné en entrée
+		exemple est de taille 1xm
+		"""
+		pass
+        
+	def evaluate(self, X, y, labels, **kwargs):
+		"""
+		c'est la méthode qui va evaluer votre modèle sur les données X
+		l'argument X est une matrice de type Numpy et de taille nxm, avec 
+		n : le nombre d'exemple de test dans le dataset
+		m : le mobre d'attribus (le nombre de caractéristiques)
+		
+		y : est une matrice numpy de taille nx1
+		
+		vous pouvez rajouter d'autres arguments, il suffit juste de
+		les expliquer en commentaire
+		"""
+		confusion_matrix = {l: {l: 0 for l in labels} for l in labels}
+		for i in range(len(X)):
+			prediction = self.predict(X[i], **kwargs)
+			confusion_matrix[prediction][y[i]] += 1
+		return confusion_matrix
+ 
+class Knn(Classifier):
 
-	def __init__(self, k=5):
+	def __init__(self, k=5, train_data=None, train_labels=None):
 		"""
 		C'est un Initializer. 
 		Vous pouvez passer d'autre paramètres au besoin,
 		c'est à vous d'utiliser vos propres notations
 		"""
 		self.k = k
-		self.train_data = None
-		self.train_labels = None
+		self.train_data = train_data
+		self.train_labels = train_labels
         
         
 	def train(self, train, train_labels): #vous pouvez rajouter d'autres attributs au besoin
@@ -48,6 +93,8 @@ class Knn: #nom de la class à changer
 		Prédire la classe d'un exemple x donné en entrée
 		exemple est de taille 1xm
 		"""
+		if self.k > len(self.train_data):
+			raise ValueError('k is greater than the number of training examples')
 		if distance_type == 'euclidean':
 			distances = np.sqrt(np.sum((self.train_data - x)**2, axis=1))
 		elif distance_type == 'manhattan':
@@ -70,14 +117,14 @@ class Knn: #nom de la class à changer
 		vous pouvez rajouter d'autres arguments, il suffit juste de
 		les expliquer en commentaire
 		"""
-		confusion_matrix = {l: {l: 0 for l in labels} for l in labels}
-		for i in range(len(X)):
-			prediction = self.predict(X[i], distance_type)
-			confusion_matrix[prediction][y[i]] += 1
-		return confusion_matrix
+		return super().evaluate(X, y, labels, distance_type=distance_type)
 		
+class NaiveBayes(Classifier):
 
-        
-	
-	# Vous pouvez rajouter d'autres méthodes et fonctions,
-	# il suffit juste de les commenter.
+	def __init__(self, train_data=None, train_labels=None):
+		"""
+		C'est un Initializer. 
+		Vous pouvez passer d'autre paramètres au besoin,
+		c'est à vous d'utiliser vos propres notations
+		"""
+		pass

@@ -1,8 +1,7 @@
 import numpy as np
 import sys
 import load_datasets
-import NaiveBayes # importer la classe du classifieur bayesien
-import Knn # importer la classe du Knn
+import Classifiers # importer les classes du classifieur bayesien et Knn
 #importer d'autres fichiers et classes si vous en avez développés
 import statistiques as stat
 
@@ -25,9 +24,12 @@ WINE_LABELS = [0,1]
 
 
 # Initialisez/instanciez vos classifieurs avec leurs paramètres
-iris_knn = Knn.Knn(k=5)
-wine_knn = Knn.Knn(k=5)
-
+iris_knn = Classifiers.Knn(k=5)
+wine_knn = Classifiers.Knn(k=5)
+abalone_knn = Classifiers.Knn(k=5)
+#iris_bayes = Classifiers.NaiveBayes()
+#wine_bayes = Classifiers.NaiveBayes()
+#abalone_bayes = Classifiers.NaiveBayes()
 
 
 # Charger/lire les datasets
@@ -57,22 +59,27 @@ IMPORTANT :
 
 
 # Tester votre classifieur
-confusion_iris = iris_knn.evaluate(iris['test'], iris['test_labels'], labels=IRIS_LABELS, distance_type='euclidean')
+
+print("\nK-nearest neighbors avec k=5 et distance euclidienne \n")
+confusion_iris_knn = iris_knn.evaluate(iris['test'], iris['test_labels'], labels=IRIS_LABELS, distance_type='euclidean')
 confusion_wine = wine_knn.evaluate(wine['test'], wine['test_labels'], labels=WINE_LABELS, distance_type='euclidean')
 
-print("Iris dataset")
-print("Matrice de confusion: ", confusion_iris)
-print("Exactitude: ", stat.accuracy(confusion_iris))
-print("Precision: ", stat.mean_precision(confusion_iris))
-print("Rappel: ", stat.mean_recall(confusion_iris))
-print("F1-score: ", stat.mean_f1_score(confusion_iris), "\n")
+print("IRIS DATASET (multi-classes)")
+print("Matrice de confusion: ", confusion_iris_knn)
+print("Exactitude:  ", stat.accuracy(confusion_iris_knn))
+print("Macro-Precision: ", stat.macro_precision(confusion_iris_knn))
+print("Macro-Rappel:    ", stat.macro_recall(confusion_iris_knn))
+print("Macro-F1-score:  ", stat.macro_f1_score(confusion_iris_knn))
+print("Weighted-Precision: ", stat.weighted_precision(confusion_iris_knn))
+print("Weighted-Rappel:    ", stat.weighted_recall(confusion_iris_knn))
+print("Weighted-F1-score:  ", stat.weighted_f1_score(confusion_iris_knn), "\n")
 
-print("Wine dataset")
+print("WINE DATASET (binaire)")
 print("Matrice de confusion: ", confusion_wine)
-print("Exactitude: ", stat.accuracy(confusion_wine))
-print("Precision: ", stat.mean_precision(confusion_wine))
-print("Rappel: ", stat.mean_recall(confusion_wine))
-print("F1-score: ", stat.mean_f1_score(confusion_wine), "\n")
+print("Exactitude:  ", stat.accuracy(confusion_wine))
+print("Precision:   ", stat.class_precision(confusion_wine, 1))
+print("Rappel:      ", stat.class_recall(confusion_wine, 1))
+print("F1-score:    ", stat.class_f1_score(confusion_wine, 1), "\n")
 
 """
 Finalement, évaluez votre modèle sur les données de test.
