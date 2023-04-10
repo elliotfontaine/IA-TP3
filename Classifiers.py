@@ -88,22 +88,29 @@ class Knn(Classifier):
 		self.train_data = train
 		self.train_labels = train_labels
     
-	def predict(self, x, distance_type='euclidean'):
+	def predict(self, x: np.ndarray, distance_type='euclidean'):
 		"""
 		Prédire la classe d'un exemple x donné en entrée
 		exemple est de taille 1xm
 		"""
+		# Préconditions
+		if self.train_data is None or self.train_labels is None:
+			raise ValueError('Train data or labels not set')
 		if self.k > len(self.train_data):
 			raise ValueError('k is greater than the number of training examples')
+		# Calcul des distances
 		if distance_type == 'euclidean':
 			distances = np.sqrt(np.sum((self.train_data - x)**2, axis=1))
 		elif distance_type == 'manhattan':
 			distances = np.sum(np.abs(self.train_data - x), axis=1)
 		else:
 			raise ValueError('Distance type not recognized')
+		# Prédiction du label
 		k_nearest = np.argsort(distances)[:self.k]
-		k_nearest_labels = self.train_labels[k_nearest]
-		return (np.bincount(k_nearest_labels)).argmax()
+		k_nearest_labels = self.train_labels[k_nearest].tolist()
+		# return (np.bincount(k_nearest_labels)).argmax()
+		most_frequent_label = max(set(k_nearest_labels), key = k_nearest_labels.count)
+		return most_frequent_label
         
 	def evaluate(self, X, y, labels, distance_type='euclidean'):
 		"""
