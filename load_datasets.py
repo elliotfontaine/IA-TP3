@@ -99,7 +99,8 @@ def load_iris_dataset(train_ratio):
     """
     
     # Vous pouvez utiliser des valeurs numériques pour les différents types de classes, tel que :
-    conversion_labels = {'Iris-setosa': 0, 'Iris-versicolor' : 1, 'Iris-virginica' : 2}
+    # conversion_labels = {'Iris-setosa': 0, 'Iris-versicolor' : 1, 'Iris-virginica' : 2}
+    conversion_labels = {'Iris-setosa': "setosa", 'Iris-versicolor' : "versicolor", 'Iris-virginica' : "virginica"}
     
     train, train_labels, test, test_labels = _load_dataset('datasets/bezdekIris.data', train_ratio, 5)
     train_labels = np.array([conversion_labels[label] for label in train_labels])
@@ -164,8 +165,16 @@ def load_abalone_dataset(train_ratio):
           que : test_labels[i] est l'etiquette pour l'exemple test[i]
     """
     
+    # conversion = {'M': (0,0,1), 'F' : (0,1,0), 'I' : (1,0,0)}
+    conversion = {'M': 1.0, 'F' : 0.0, 'I' : 0.5}
     # La fonction doit retourner 4 matrices (ou vecteurs) de type Numpy.
     train, train_labels, test, test_labels = _load_dataset('datasets/abalone-intervalles.csv', train_ratio, 9)
+    for row in train:
+      row[0] = conversion[row[0]]
+    for row in test:
+      row[0] = conversion[row[0]]
+    train, test = train.astype(float), test.astype(float)
+    train_labels, test_labels = train_labels.astype(float).astype(int), test_labels.astype(float).astype(int)
     return (train, train_labels, test, test_labels)
 
 

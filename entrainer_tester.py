@@ -18,8 +18,10 @@ En gros, vous allez :
 
 # Initialisez vos paramètres
 TRAIN_RATIO = 0.8
-IRIS_LABELS = [0,1,2]
+#IRIS_LABELS = [0,1,2]
+IRIS_LABELS = ["setosa", "versicolor", "virginica"]
 WINE_LABELS = [0,1]
+ABALONE_LABELS = [0,1,2]
 
 
 
@@ -37,11 +39,13 @@ keys = ['train', 'train_labels', 'test', 'test_labels']
 iris = dict(zip(keys, load_datasets.load_iris_dataset(TRAIN_RATIO)))
 wine = dict(zip(keys, load_datasets.load_wine_dataset(TRAIN_RATIO)))
 abalone = dict(zip(keys, load_datasets.load_abalone_dataset(TRAIN_RATIO)))
+# print(abalone)
 
 
 # Entrainez votre classifieur
 iris_knn.train(iris['train'], iris['train_labels'])
 wine_knn.train(wine['train'], wine['train_labels'])
+abalone_knn.train(abalone['train'], abalone['train_labels'])
 
 """
 Après avoir fait l'entrainement, évaluez votre modèle sur 
@@ -60,9 +64,10 @@ IMPORTANT :
 
 # Tester votre classifieur
 
-print("\nK-nearest neighbors avec k=5 et distance euclidienne \n")
-confusion_iris_knn = iris_knn.evaluate(iris['test'], iris['test_labels'], labels=IRIS_LABELS, distance_type='euclidean')
-confusion_wine = wine_knn.evaluate(wine['test'], wine['test_labels'], labels=WINE_LABELS, distance_type='euclidean')
+print("\n________ K-nearest neighbors avec k=5 et distance euclidienne ________\n")
+confusion_iris_knn = iris_knn.evaluate(iris['test'], iris['test_labels'])
+confusion_wine = wine_knn.evaluate(wine['test'], wine['test_labels'])
+confusion_abalone = abalone_knn.evaluate(abalone['test'], abalone['test_labels'])
 
 print("IRIS DATASET (multi-classes)")
 print("Matrice de confusion: ", confusion_iris_knn)
@@ -80,6 +85,16 @@ print("Exactitude:  ", stat.accuracy(confusion_wine))
 print("Precision:   ", stat.class_precision(confusion_wine, 1))
 print("Rappel:      ", stat.class_recall(confusion_wine, 1))
 print("F1-score:    ", stat.class_f1_score(confusion_wine, 1), "\n")
+
+print("ABALONE DATASET (multi-classes)")
+print("Matrice de confusion:", confusion_abalone)
+print("Exactitude:", stat.accuracy(confusion_abalone))
+print("Macro-Precision:", stat.macro_precision(confusion_abalone))
+print("Macro-Rappel:", stat.macro_recall(confusion_abalone))
+print("Macro-F1-score:", stat.macro_f1_score(confusion_abalone))
+print("Weighted-Precision:", stat.weighted_precision(confusion_abalone))
+print("Weighted-Rappel:", stat.weighted_recall(confusion_abalone))
+print("Weighted-F1-score:", stat.weighted_f1_score(confusion_abalone), "\n")
 
 """
 Finalement, évaluez votre modèle sur les données de test.

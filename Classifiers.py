@@ -61,7 +61,7 @@ class Classifier(ABC): #nom de la class à changer
  
 class Knn(Classifier):
 
-	def __init__(self, k=5, train_data=None, train_labels=None):
+	def __init__(self, k, train_data=None, train_labels=None):
 		"""
 		C'est un Initializer. 
 		Vous pouvez passer d'autre paramètres au besoin,
@@ -70,6 +70,7 @@ class Knn(Classifier):
 		self.k = k
 		self.train_data = train_data
 		self.train_labels = train_labels
+		self.unique_labels = np.unique(train_labels)
         
         
 	def train(self, train, train_labels): #vous pouvez rajouter d'autres attributs au besoin
@@ -87,6 +88,7 @@ class Knn(Classifier):
 		"""
 		self.train_data = train
 		self.train_labels = train_labels
+		self.unique_labels = np.unique(train_labels)
     
 	def predict(self, x: np.ndarray, distance_type='euclidean'):
 		"""
@@ -112,7 +114,7 @@ class Knn(Classifier):
 		most_frequent_label = max(set(k_nearest_labels), key = k_nearest_labels.count)
 		return most_frequent_label
         
-	def evaluate(self, X, y, labels, distance_type='euclidean'):
+	def evaluate(self, X, y, distance_type='euclidean'):
 		"""
 		c'est la méthode qui va evaluer votre modèle sur les données X
 		l'argument X est une matrice de type Numpy et de taille nxm, avec 
@@ -124,7 +126,7 @@ class Knn(Classifier):
 		vous pouvez rajouter d'autres arguments, il suffit juste de
 		les expliquer en commentaire
 		"""
-		return super().evaluate(X, y, labels, distance_type=distance_type)
+		return super().evaluate(X, y, self.unique_labels, distance_type=distance_type)
 		
 class NaiveBayes(Classifier):
 
