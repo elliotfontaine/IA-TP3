@@ -175,7 +175,8 @@ class NaiveBayes(Classifier):
 		Prédire la classe d'un exemple x donné en entrée
 		exemple est de taille 1xm
 		"""
-		pass
+		tree = self.tree
+		
         
 
 	def evaluate(self, X, y, labels):
@@ -485,6 +486,7 @@ b = NaiveBayes()
 x = b.choose_attribut(indexes, bells, matrice)
 print(x)
 """
+
 
 #build_tree
 att1 = ['e', 'e', 'n', 'p', 'p', 'p', 'n', 'e', 'e', 'p', 'e', 'n', 'n', 'p'] #ciel
