@@ -185,17 +185,17 @@ def load_abalone_dataset(train_ratio):
         - test_labels : contient les étiquettes pour chaque exemple dans test, de telle sorte
           que : test_labels[i] est l'etiquette pour l'exemple test[i]
     """
-    
-    # conversion = {'M': (0,0,1), 'F' : (0,1,0), 'I' : (1,0,0)}
-    conversion = {'M': 1.0, 'F' : 0.0, 'I' : 0.5}
-    # La fonction doit retourner 4 matrices (ou vecteurs) de type Numpy.
     train, train_labels, test, test_labels = _load_dataset('datasets/abalone-intervalles.csv', train_ratio, 9)
+    
+    conversion = {'M': 1.0, 'F' : 0.0, 'I' : 0.5}
     for row in train:
       row[0] = conversion[row[0]]
     for row in test:
       row[0] = conversion[row[0]]
     train, test = normalize(train.astype(float)), normalize(test.astype(float))
     train_labels, test_labels = train_labels.astype(float).astype(int), test_labels.astype(float).astype(int)
+    
+    # La fonction doit retourner 4 matrices (ou vecteurs) de type Numpy.
     return (train, train_labels, test, test_labels)
 
 

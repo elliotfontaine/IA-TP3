@@ -111,16 +111,16 @@ def print_stats(confusion_matrix, binary=False):
     et moyennes pondérées par les effectifs de classes (weighted) sont affichées.
     """
     print("Matrice de confusion: ", confusion_matrix)
-    print("Exactitude:  ", accuracy(confusion_matrix))
+    print("Exactitude:  ", round(accuracy(confusion_matrix), 2))
     if binary:
-        print("Precision:   ", class_precision(confusion_matrix, 1))
-        print("Rappel:      ", class_recall(confusion_matrix, 1))
-        print("F1-score:    ", class_f1_score(confusion_matrix, 1), "\n")
+        print("Precision:   ", round(class_precision(confusion_matrix, 1), 2))
+        print("Rappel:      ", round(class_recall(confusion_matrix, 1), 2))
+        print("F1-score:    ", round(class_f1_score(confusion_matrix, 1), 2), "\n")
     else:
-        print("Macro-Precision: ", macro_precision(confusion_matrix))
-        print("Macro-Rappel:    ", macro_recall(confusion_matrix))
-        print("Macro-F1-score:  ", macro_f1_score(confusion_matrix))
-        print("Weighted-Precision: ", weighted_precision(confusion_matrix))
-        print("Weighted-Rappel:    ", weighted_recall(confusion_matrix))
-        print("Weighted-F1-score:  ", weighted_f1_score(confusion_matrix), "\n")
+        print("Macro-Precision: ", macro_precision(confusion_matrix).round(2))
+        print("Macro-Rappel:    ", macro_recall(confusion_matrix).round(2))
+        print("Macro-F1-score:  ", macro_f1_score(confusion_matrix).round(2))
+        print("Weighted-Precision: ", weighted_precision(confusion_matrix).round(2))
+        print("Weighted-Rappel:    ", weighted_recall(confusion_matrix).round(2))
+        print("Weighted-F1-score:  ", weighted_f1_score(confusion_matrix).round(2), "\n")
     

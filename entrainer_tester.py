@@ -1,9 +1,7 @@
-import numpy as np
-import sys
 import load_datasets
 import Classifiers # importer les classes du classifieur bayesien et Knn
 #importer d'autres fichiers et classes si vous en avez développés
-import statistiques as stat
+import statistiques as stat # importer les fonctions de calcul des métriques
 
 """
 C'est le fichier main duquel nous allons tout lancer
@@ -18,7 +16,6 @@ En gros, vous allez :
 
 # Initialisez vos paramètres
 TRAIN_RATIO = 0.8
-#IRIS_LABELS = [0,1,2]
 IRIS_LABELS = ["setosa", "versicolor", "virginica"]
 WINE_LABELS = [0,1]
 ABALONE_LABELS = [0,1,2]
@@ -58,7 +55,18 @@ IMPORTANT :
     - le rappel (recall)
     - le F1-score
 """
+# confusion_iris_knn = iris_knn.evaluate(iris['train'], iris['train_labels'])
+# confusion_wine_knn = wine_knn.evaluate(wine['train'], wine['train_labels'])
+# confusion_abalone_knn = abalone_knn.evaluate(abalone['train'], abalone['train_labels'])
 
+# print("IRIS DATASET (multi-classes)")
+# stat.print_stats(confusion_iris_knn)
+# ""
+# print("WINE DATASET (binaire)")
+# stat.print_stats(confusion_wine_knn, binary=True)
+
+# print("ABALONE DATASET (multi-classes)")
+# stat.print_stats(confusion_abalone_knn)
 
 
 
