@@ -64,37 +64,19 @@ IMPORTANT :
 
 # Tester votre classifieur
 
-print("\n________ K-nearest neighbors avec k=5 et distance euclidienne ________\n")
+print("\n█████████████ K-nearest neighbors avec k=5 et distance euclidienne █████████████\n")
 confusion_iris_knn = iris_knn.evaluate(iris['test'], iris['test_labels'])
-confusion_wine = wine_knn.evaluate(wine['test'], wine['test_labels'])
-confusion_abalone = abalone_knn.evaluate(abalone['test'], abalone['test_labels'])
+confusion_wine_knn = wine_knn.evaluate(wine['test'], wine['test_labels'])
+confusion_abalone_knn = abalone_knn.evaluate(abalone['test'], abalone['test_labels'])
 
 print("IRIS DATASET (multi-classes)")
-print("Matrice de confusion: ", confusion_iris_knn)
-print("Exactitude:  ", stat.accuracy(confusion_iris_knn))
-print("Macro-Precision: ", stat.macro_precision(confusion_iris_knn))
-print("Macro-Rappel:    ", stat.macro_recall(confusion_iris_knn))
-print("Macro-F1-score:  ", stat.macro_f1_score(confusion_iris_knn))
-print("Weighted-Precision: ", stat.weighted_precision(confusion_iris_knn))
-print("Weighted-Rappel:    ", stat.weighted_recall(confusion_iris_knn))
-print("Weighted-F1-score:  ", stat.weighted_f1_score(confusion_iris_knn), "\n")
-
+stat.print_stats(confusion_iris_knn)
+""
 print("WINE DATASET (binaire)")
-print("Matrice de confusion: ", confusion_wine)
-print("Exactitude:  ", stat.accuracy(confusion_wine))
-print("Precision:   ", stat.class_precision(confusion_wine, 1))
-print("Rappel:      ", stat.class_recall(confusion_wine, 1))
-print("F1-score:    ", stat.class_f1_score(confusion_wine, 1), "\n")
+stat.print_stats(confusion_wine_knn, binary=True)
 
 print("ABALONE DATASET (multi-classes)")
-print("Matrice de confusion:", confusion_abalone)
-print("Exactitude:", stat.accuracy(confusion_abalone))
-print("Macro-Precision:", stat.macro_precision(confusion_abalone))
-print("Macro-Rappel:", stat.macro_recall(confusion_abalone))
-print("Macro-F1-score:", stat.macro_f1_score(confusion_abalone))
-print("Weighted-Precision:", stat.weighted_precision(confusion_abalone))
-print("Weighted-Rappel:", stat.weighted_recall(confusion_abalone))
-print("Weighted-F1-score:", stat.weighted_f1_score(confusion_abalone), "\n")
+stat.print_stats(confusion_abalone_knn)
 
 """
 Finalement, évaluez votre modèle sur les données de test.

@@ -97,3 +97,30 @@ def weighted_f1_score(confusion_matrix):
     weights = [sum([confusion_matrix[predicted_label][true_label] for predicted_label in confusion_matrix]) for true_label in confusion_matrix]
     class_f1_scores = [class_f1_score(confusion_matrix, label) for label in confusion_matrix]
     return np.average(class_f1_scores, weights=weights)
+
+def print_stats(confusion_matrix, binary=False):
+    """
+    Affiche les statistiques calculées à partir d'une matrice de confusion.
+    
+    Args:
+        - confusion_matrix (dict): matrice de confusion issue d'un modèle de classification.
+        - binary (bool): indique si le problème est binaire ou multi-classe.
+        
+    Dans le cas binaire, le rappel, la précision et le F1-score sont affichés pour la classe positive (d'étiquette 1).  
+    Dans le cas multi-classe, le rappel, la précision et le F1-score sont calculés pour chaque classe et les moyennes (macro)
+    et moyennes pondérées par les effectifs de classes (weighted) sont affichées.
+    """
+    print("Matrice de confusion: ", confusion_matrix)
+    print("Exactitude:  ", accuracy(confusion_matrix))
+    if binary:
+        print("Precision:   ", class_precision(confusion_matrix, 1))
+        print("Rappel:      ", class_recall(confusion_matrix, 1))
+        print("F1-score:    ", class_f1_score(confusion_matrix, 1), "\n")
+    else:
+        print("Macro-Precision: ", macro_precision(confusion_matrix))
+        print("Macro-Rappel:    ", macro_recall(confusion_matrix))
+        print("Macro-F1-score:  ", macro_f1_score(confusion_matrix))
+        print("Weighted-Precision: ", weighted_precision(confusion_matrix))
+        print("Weighted-Rappel:    ", weighted_recall(confusion_matrix))
+        print("Weighted-F1-score:  ", weighted_f1_score(confusion_matrix), "\n")
+    
