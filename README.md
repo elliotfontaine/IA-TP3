@@ -23,4 +23,4 @@
 
 ## Difficultés rencontrées:
 - **Nature des données:** la conversion des données catégorielles non-binaires pour le K-nn. En particulier, le sexe (mâle, femelle, enfant) du datatset Abalones. On a décidé de convertir {M, I, F} en {O, 1, 2}, même si ca provoque des distances inégales entre les 3. Les résultats restent honorables pour ce dataset (exactitude=81%)
-- **Implémentation du classificateur naïf bayésien:**
+- **Implémentation du classificateur naïf bayésien:** Des bugs dans la logique de la construction de l'arbre on forcer la réécriture de cette partie avec une nouvelle logique de récursion. Ceci a briser la fonction de création de l'arbre (la fonction plante avant de créer un arbre).
