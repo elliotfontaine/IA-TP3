@@ -51,8 +51,11 @@ class Classifier(ABC): #nom de la class à changer
 		
 		y : est une matrice numpy de taille nx1
 		
-		vous pouvez rajouter d'autres arguments, il suffit juste de
-		les expliquer en commentaire
+		Retourne:
+			confusion_matrix: 
+   			Exemple de matrice de confusion :
+  			{A: {A: 11, B: 0, C: 0}, B: {A: 0, B: 8, C: 0}, C: {A: 0, B: 1, C: 10}} où A, B et C sont les labels des classes
+			On la parcourt de la manière suivante: confusion_matrix[prediction][vrai_label]
 		"""
 		confusion_matrix = {l: {l: 0 for l in labels} for l in labels}
 		for i in range(len(X)):
@@ -127,7 +130,8 @@ class Knn(Classifier):
 		vous pouvez rajouter d'autres arguments, il suffit juste de
 		les expliquer en commentaire
 		"""
-		return super().evaluate(X, y, self.unique_labels, distance_type=distance_type)
+		matrix_labels = np.unique(np.concatenate((self.train_labels, y)))
+		return super().evaluate(X, y, matrix_labels, distance_type=distance_type)
 		
 class NaiveBayes(Classifier):
 
@@ -488,7 +492,7 @@ print(x)
 """
 
 
-#build_tree
+""" #build_tree
 att1 = ['e', 'e', 'n', 'p', 'p', 'p', 'n', 'e', 'e', 'p', 'e', 'n', 'n', 'p'] #ciel
 att2 = ['c', 'c', 'c', 't', 'f', 'f', 'f', 't', 'f', 't', 't', 't', 'c', 't'] #temp
 att3 = ['e', 'e', 'e', 'e', 'n', 'n', 'n', 'e', 'n', 'n', 'n', 'e', 'n', 'e'] #humidite
@@ -497,4 +501,4 @@ matrice = [att1, att2, att3, att4]
 bells = [0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0] #jouerTennis
 indexes = [0,1,2,3]
 b = NaiveBayes()
-x = b.build_tree(matrice, bells, indexes, bells[0], [1,1,1,1])
+x = b.build_tree(matrice, bells, indexes, bells[0], [1,1,1,1]) """
