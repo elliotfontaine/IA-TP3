@@ -72,6 +72,28 @@ def _load_dataset(filename, train_ratio, lenght_data):
   # Tres important : la fonction doit retourner 4 matrices (ou vecteurs) de type Numpy. 
   return (train, train_labels, test, test_labels)
 
+def normalize(dataset):
+    """
+    Applique une standardisation (z-score normalization) sur chaque colonne d'un array numpy à 2 dimensions.
+    Ne modifie pas le dataset original. Renvoie une copie standardisée.
+    
+    Paramètres :
+        - dataset : array numpy à 2 dimensions
+        
+    Retourne :
+        - std_dataset : array numpy standardisé
+    """
+    # Calcul des moyennes et écart-types de chaque colonne
+    moyennes = np.mean(dataset, axis=0)
+    ecarts_types = np.std(dataset, axis=0)
+    
+    # Soustraction des moyennes pour centrer les données
+    dataset_centre = dataset - moyennes
+    
+    # Division par les écart-types pour standardiser les données
+    std_dataset = dataset_centre / ecarts_types
+    
+    return std_dataset
 
 def load_iris_dataset(train_ratio):
     """Cette fonction a pour but de lire le dataset Iris
@@ -97,14 +119,13 @@ def load_iris_dataset(train_ratio):
         - test_labels : contient les étiquettes pour chaque exemple dans test, de telle sorte
           que : test_labels[i] est l'etiquette pour l'exemple test[i]
     """
-    
-    # Vous pouvez utiliser des valeurs numériques pour les différents types de classes, tel que :
-    # conversion_labels = {'Iris-setosa': 0, 'Iris-versicolor' : 1, 'Iris-virginica' : 2}
-    conversion_labels = {'Iris-setosa': "setosa", 'Iris-versicolor' : "versicolor", 'Iris-virginica' : "virginica"}
-    
     train, train_labels, test, test_labels = _load_dataset('datasets/bezdekIris.data', train_ratio, 5)
+    
+    conversion_labels = {'Iris-setosa': "setosa", 'Iris-versicolor' : "versicolor", 'Iris-virginica' : "virginica"}
     train_labels = np.array([conversion_labels[label] for label in train_labels])
     test_labels = np.array([conversion_labels[label] for label in test_labels])
+    
+    train, test = normalize(train), normalize(test)
     
     # Tres important : la fonction doit retourner 4 matrices (ou vecteurs) de type Numpy.
     return (train, train_labels, test, test_labels)
@@ -134,7 +155,7 @@ def load_wine_dataset(train_ratio):
     """
 	
     train, train_labels, test, test_labels = _load_dataset('datasets/binary-winequality-white.csv', train_ratio, 12)
-    train, test = train.astype(float), test.astype(float)
+    train, test = normalize(train.astype(float)), normalize(test.astype(float))
     train_labels, test_labels = train_labels.astype(int), test_labels.astype(int)
     
     # La fonction doit retourner 4 structures de données de type Numpy.
@@ -173,7 +194,7 @@ def load_abalone_dataset(train_ratio):
       row[0] = conversion[row[0]]
     for row in test:
       row[0] = conversion[row[0]]
-    train, test = train.astype(float), test.astype(float)
+    train, test = normalize(train.astype(float)), normalize(test.astype(float))
     train_labels, test_labels = train_labels.astype(float).astype(int), test_labels.astype(float).astype(int)
     return (train, train_labels, test, test_labels)
 
