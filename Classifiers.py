@@ -490,7 +490,7 @@ x = b.choose_attribut(indexes, bells, matrice)
 print(x)
 """
 
-#build_tree
+""" #build_tree
 att1 = ['e', 'e', 'n', 'p', 'p', 'p', 'n', 'e', 'e', 'p', 'e', 'n', 'n', 'p'] #ciel
 att2 = ['c', 'c', 'c', 't', 'f', 'f', 'f', 't', 'f', 't', 't', 't', 'c', 't'] #temp
 att3 = ['e', 'e', 'e', 'e', 'n', 'n', 'n', 'e', 'n', 'n', 'n', 'e', 'n', 'e'] #humidite
@@ -499,4 +499,4 @@ matrice = [att1, att2, att3, att4]
 bells = [0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0] #jouerTennis
 indexes = [0,1,2,3]
 b = NaiveBayes()
-x = b.build_tree(matrice, bells, indexes, bells[0], [1,1,1,1])
+x = b.build_tree(matrice, bells, indexes, bells[0], [1,1,1,1]) """
