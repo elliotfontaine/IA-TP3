@@ -62,7 +62,8 @@ class Classifier(ABC): #nom de la class à changer
 		"""
 		confusion_matrix = {l: {l: 0 for l in labels} for l in labels}
 		for i in range(len(X)):
-			prediction = self.predict(X[i], **kwargs)[0] # predict doit renvoyer le label à l'emplacement 0
+			result = self.predict(X[i], **kwargs)
+			prediction = result if type(result) is not tuple else result[0]
 			confusion_matrix[prediction][y[i]] += 1
 		return confusion_matrix   
 	
