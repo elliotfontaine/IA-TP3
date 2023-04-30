@@ -15,10 +15,7 @@ En gros, vous allez :
 """
 
 # Initialisez vos paramètres
-TRAIN_RATIO = 0.8
-IRIS_LABELS = ["setosa", "versicolor", "virginica"]
-WINE_LABELS = [0,1]
-ABALONE_LABELS = [0,1,2]
+TRAIN_RATIO = 0.7
 
 
 

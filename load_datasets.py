@@ -121,7 +121,8 @@ def load_iris_dataset(train_ratio):
     """
     train, train_labels, test, test_labels = _load_dataset('datasets/bezdekIris.data', train_ratio, 5)
     
-    conversion_labels = {'Iris-setosa': "setosa", 'Iris-versicolor' : "versicolor", 'Iris-virginica' : "virginica"}
+    # conversion_labels = {'Iris-setosa': "setosa", 'Iris-versicolor' : "versicolor", 'Iris-virginica' : "virginica"}
+    conversion_labels = {'Iris-setosa': 0, 'Iris-versicolor' : 1, 'Iris-virginica' : 2}
     train_labels = np.array([conversion_labels[label] for label in train_labels])
     test_labels = np.array([conversion_labels[label] for label in test_labels])
     

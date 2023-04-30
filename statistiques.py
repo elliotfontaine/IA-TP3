@@ -111,16 +111,19 @@ def print_stats(confusion_matrix, binary=False):
     et moyennes pondérées par les effectifs de classes (weighted) sont affichées.
     """
     print("Matrice de confusion: ", confusion_matrix)
-    print("Exactitude:  ", round(accuracy(confusion_matrix), 2))
+    print("exactitude:  ", round(accuracy(confusion_matrix), 2))
     if binary:
-        print("Precision:   ", round(class_precision(confusion_matrix, 1), 2))
-        print("Rappel:      ", round(class_recall(confusion_matrix, 1), 2))
-        print("F1-score:    ", round(class_f1_score(confusion_matrix, 1), 2), "\n")
+        for stat in [class_precision, class_recall, class_f1_score]:
+            try:
+                print(stat.__name__, ": ", round(stat(confusion_matrix, 1), 2))
+            except ZeroDivisionError:
+                print(stat.__name__, ": ", "Non défini (division par 0)")
     else:
-        print("Macro-Precision: ", macro_precision(confusion_matrix).round(2))
-        print("Macro-Rappel:    ", macro_recall(confusion_matrix).round(2))
-        print("Macro-F1-score:  ", macro_f1_score(confusion_matrix).round(2))
-        print("Weighted-Precision: ", weighted_precision(confusion_matrix).round(2))
-        print("Weighted-Rappel:    ", weighted_recall(confusion_matrix).round(2))
-        print("Weighted-F1-score:  ", weighted_f1_score(confusion_matrix).round(2), "\n")
+        for stat in [macro_precision, macro_recall, macro_f1_score, weighted_precision, weighted_recall, weighted_f1_score]:
+            try:
+                print(stat.__name__, ": ", round(stat(confusion_matrix), 2))
+            except ZeroDivisionError:
+                print(stat.__name__, ": ", "Non défini (division par 0)")
+            
+        
     

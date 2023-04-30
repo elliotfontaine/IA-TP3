@@ -62,7 +62,7 @@ class Classifier(ABC): #nom de la class à changer
 		"""
 		confusion_matrix = {l: {l: 0 for l in labels} for l in labels}
 		for i in range(len(X)):
-			prediction = self.predict(X[i], **kwargs)
+			prediction = self.predict(X[i], **kwargs)[0] # predict doit renvoyer le label à l'emplacement 0
 			confusion_matrix[prediction][y[i]] += 1
 		return confusion_matrix   
 	
@@ -648,18 +648,18 @@ class NeuralNet(Classifier):
 		self.w2: np.array = None # array (de poids entre la couche cachée et la couche de sortie
 		self.b1: np.array = None # vecteur de biais entre la couche d'entrée et la couche cachée
 		self.b2: np.array = None # vecteur de biais entre la couche cachée et la couche de sortie
+		self.classes: np.array = None # array des classes observées lors de l'entraînement
 
-	def train(self, train, train_labels, early_stopping_rounds=10, tol=1e-4): #vous pouvez rajouter d'autres attributs au besoin
+	def train(self, train, train_labels, early_stopping_rounds=10, tol=1e-4): 
 		"""
 		C'est la méthode qui va entrainer votre modèle,
-		train est une matrice de type Numpy et de taille nxm, avec 
-		n : le nombre d'exemple d'entrainement dans le dataset
-		m : le nombre d'attributs (le nombre de caractéristiques)
+		train est une matrice de type Numpy et de taille n*m, avec 
+			n : le nombre d'exemple d'entrainement dans le dataset
+			m : le nombre d'attributs (le nombre de caractéristiques)
 		
-		train_labels : est une matrice numpy de taille nx1
+		train_labels : est une matrice numpy de taille n*1
 		
-		vous pouvez rajouter d'autres arguments, il suffit juste de
-		les expliquer en commentaire
+		early_stopping_rounds, tol : ces deux variables sont utilisés pour le critère d'arrêt précoce (tol=tolerance)
 		
 		"""
 		self.trained = True
@@ -673,6 +673,7 @@ class NeuralNet(Classifier):
 		self.w2 = np.random.randn(self.widht, n_classes) * 0.01
 		self.b1 = np.zeros((1, self.widht))
 		self.b2 = np.zeros((1, n_classes))
+		print(self.w1, self.w2, self.b1, self.b2)
 
 		# Transformation des étiquettes en représentation one-hot
 		one_hot_labels = np.eye(n_classes)[train_labels.reshape(-1)]
@@ -681,7 +682,7 @@ class NeuralNet(Classifier):
 		no_improvement = 0
 
 		# 2. Boucle d'entraînement
-		for i in range(self.max_iter):
+		for i in range(1, self.max_iter + 1):
 			loss = 0
 			dw1, dw2, db1, db2 = 0, 0, 0, 0
 
@@ -694,7 +695,7 @@ class NeuralNet(Classifier):
 				error = y_true - a2
 				loss += -np.sum(y_true * np.log(a2 + 1e-9))
 
-				# 2.c. Rétropropagation (backpropagation)
+				# 2.c. Rétropropagation (backpropagation). "dx" représente la dérivée de l'erreur par rapport à "x".
 				da2 = error
 				dz2 = da2 * a2 * (1 - a2)
 				dw2 += np.dot(a1.T, dz2)
@@ -724,8 +725,8 @@ class NeuralNet(Classifier):
 				print(f"Arrêt anticipé après {i} itérations.")
 				break
 
-			# Affichage de la perte à chaque itération
-			if i % 10 == 0:
+			# Affichage de la perte à chaque dizaine d'itérations
+			if i % 10 == 0 or i == 1:
 				print(f"Iteration {i}, Loss: {loss}")
   
 
@@ -743,6 +744,21 @@ class NeuralNet(Classifier):
 		return (self.classes[np.argmax(a2)], # argmax retourne l'indice de la valeur la plus grande, cet indice correspond à la classe prédite
           (z1,a1,z2,a2)) # on retourne aussi les valeurs de z1, a1, z2 et a2 pour le calcul du gradient et la rétropropagation
 
+	def evaluate(self, X, y):
+		"""
+		c'est la méthode qui va evaluer votre modèle sur les données X
+		l'argument X est une matrice de type Numpy et de taille nxm, avec 
+		n : le nombre d'exemple de test dans le dataset
+		m : le mobre d'attribus (le nombre de caractéristiques)
+		
+		y : est une matrice numpy de taille nx1
+		
+		vous pouvez rajouter d'autres arguments, il suffit juste de
+		les expliquer en commentaire
+		"""
+		matrix_labels = np.unique(np.concatenate((self.classes, y)))
+		return super().evaluate(X, y, matrix_labels)
+    
 	@staticmethod
 	def sigmoid(z):
 		"""
@@ -750,7 +766,18 @@ class NeuralNet(Classifier):
   		"""
 		return 1 / (1 + np.exp(-z))
 
-
+""" import statistiques as stats
+import load_datasets
+wine_neural = NeuralNet(learning_rate=0.1, max_iter=1000, widht=10)
+# Charger/lire les datasets
+keys = ['train', 'train_labels', 'test', 'test_labels']
+wine = dict(zip(keys, load_datasets.load_abalone_dataset(0.7)))
+# Entrainez votre classifieur
+wine_neural.train(wine['train'], wine['train_labels'])
+print("WINE DATASET (binaire)")
+print(wine_neural.w1, wine_neural.w2, wine_neural.b1, wine_neural.b2)
+confusion_wine_neural = wine_neural.evaluate(wine['test'], wine['test_labels'])
+stat.print_stats(confusion_wine_neural, binary=False) """
 
 
 """" #get_label_entropy
