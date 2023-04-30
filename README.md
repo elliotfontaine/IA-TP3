@@ -5,7 +5,7 @@
 
 
 ## Répartition des tâches:
-- **Elliot**: classe `Knn(Classifier)`, `load_dataset.py`, `statistiques.py`, `README.md`, rapport PDF, architecture du projet.  
+- **Elliot**: classe `Knn(Classifier)`, `load_dataset.py`, `statistiques.py`, `README.md`, `comparaison-scikit-learn`, rapport PDF, architecture du projet.  
 *TRANSPARENCE*: des outils basés sur l'intelligence artificielle (ChatGPT et Github Copilot) ont été utilisés pour le codage. Le filtre de suggestions de Copilot a été activé pour éviter de plagier du code public.
 - **Adam**: classe `NaiveBayes(Classifier)`, rapport PDF
 
