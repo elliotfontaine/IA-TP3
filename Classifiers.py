@@ -1,7 +1,7 @@
 """
 Vous allez definir une classe pour chaque algorithme que vous allez développer,
 votre classe doit contenir au moins les 3 méthodes definies ici bas, 
-	* train 	: pour entrainer le modèle sur l'ensemble d'entrainement.
+	* train 	: pour entraîner le modèle sur l'ensemble d'entrainement.
 	* predict 	: pour prédire la classe d'un exemple donné.
 	* evaluate 		: pour evaluer le classifieur avec les métriques demandées. 
 vous pouvez rajouter d'autres méthodes qui peuvent vous etre utiles, mais la correction
@@ -11,20 +11,30 @@ se fera en utilisant les méthodes train, predict et evaluate de votre code.
 import numpy as np
 import math
 from abc import ABC, abstractmethod
+import random
+import statistiques as stat # importer les fonctions de calcul des métriques REMOVE
+
 
 # le nom de votre classe
-# BayesNaif pour le modèle bayesien naif
-# Knn pour le modèle des k plus proches voisins
+# DecisionTree pour l'arbre de décision
+# NeuralNet pour le réseau de neurones
 
-class Classifier(ABC): #nom de la class à changer
-	
-	@abstractmethod
+class Classifier: #nom de la class à changer
+
+	def __init__(self, **kwargs):
+		"""
+		C'est un Initializer. 
+		Vous pouvez passer d'autre paramètres au besoin,
+		c'est à vous d'utiliser vos propres notations
+		"""
+		
+		
 	def train(self, train, train_labels): #vous pouvez rajouter d'autres attributs au besoin
 		"""
 		C'est la méthode qui va entrainer votre modèle,
 		train est une matrice de type Numpy et de taille nxm, avec 
 		n : le nombre d'exemple d'entrainement dans le dataset
-		m : le mobre d'attribus (le nombre de caractéristiques)
+		m : le nombre d'attributs (le nombre de caractéristiques)
 		
 		train_labels : est une matrice numpy de taille nx1
 		
@@ -33,8 +43,7 @@ class Classifier(ABC): #nom de la class à changer
 		
 		"""
 		pass
-    
-	@abstractmethod
+        
 	def predict(self, x):
 		"""
 		Prédire la classe d'un exemple x donné en entrée
@@ -61,81 +70,15 @@ class Classifier(ABC): #nom de la class à changer
 		for i in range(len(X)):
 			prediction = self.predict(X[i], **kwargs)
 			confusion_matrix[prediction][y[i]] += 1
-		return confusion_matrix
- 
-class Knn(Classifier):
+		return confusion_matrix   
+	
+	# Vous pouvez rajouter d'autres méthodes et fonctions,
+	# il suffit juste de les commenter.
 
-	def __init__(self, k, train_data=None, train_labels=None):
-		"""
-		C'est un Initializer. 
-		Vous pouvez passer d'autre paramètres au besoin,
-		c'est à vous d'utiliser vos propres notations
-		"""
-		self.k = k
-		self.train_data = train_data
-		self.train_labels = train_labels
-		self.unique_labels = np.unique(train_labels)
-        
-        
-	def train(self, train, train_labels): #vous pouvez rajouter d'autres attributs au besoin
-		"""
-		C'est la méthode qui va entrainer votre modèle,
-		train est une matrice de type Numpy et de taille nxm, avec 
-		n : le nombre d'exemple d'entrainement dans le dataset
-		m : le nombre d'attributs (le nombre de caractéristiques)
-		
-		train_labels : est une matrice numpy de taille nx1
-		
-		vous pouvez rajouter d'autres arguments, il suffit juste de
-		les expliquer en commentaire
-		
-		"""
-		self.train_data = train
-		self.train_labels = train_labels
-		self.unique_labels = np.unique(train_labels)
-    
-	def predict(self, x: np.ndarray, distance_type='euclidean'):
-		"""
-		Prédire la classe d'un exemple x donné en entrée
-		exemple est de taille 1xm
-		"""
-		# Préconditions
-		if self.train_data is None or self.train_labels is None:
-			raise ValueError('Train data or labels not set')
-		if self.k > len(self.train_data):
-			raise ValueError('k is greater than the number of training examples')
-		# Calcul des distances
-		if distance_type == 'euclidean':
-			distances = np.sqrt(np.sum((self.train_data - x)**2, axis=1))
-		elif distance_type == 'manhattan':
-			distances = np.sum(np.abs(self.train_data - x), axis=1)
-		else:
-			raise ValueError('Distance type not recognized')
-		# Prédiction du label
-		k_nearest = np.argsort(distances)[:self.k]
-		k_nearest_labels = self.train_labels[k_nearest].tolist()
-		# return (np.bincount(k_nearest_labels)).argmax()
-		most_frequent_label = max(set(k_nearest_labels), key = k_nearest_labels.count)
-		return most_frequent_label
-        
-	def evaluate(self, X, y, distance_type='euclidean'):
-		"""
-		c'est la méthode qui va evaluer votre modèle sur les données X
-		l'argument X est une matrice de type Numpy et de taille nxm, avec 
-		n : le nombre d'exemple de test dans le dataset
-		m : le mobre d'attribus (le nombre de caractéristiques)
-		
-		y : est une matrice numpy de taille nx1
-		
-		vous pouvez rajouter d'autres arguments, il suffit juste de
-		les expliquer en commentaire
-		"""
-		matrix_labels = np.unique(np.concatenate((self.train_labels, y)))
-		return super().evaluate(X, y, matrix_labels, distance_type=distance_type)
-		
-class NaiveBayes(Classifier):
 
-	def __init__(self, train_data=None, train_labels=None, validation_data=None, validation_labels=None, tree=None):
+class ArbreDecision(Classifier):
+
+	def __init__(self, train_data=None, train_labels=None, validation_data=None, validation_labels=None, tree=None, hauteur_max=None, nb_coupe_max=None):
 		"""
 		C'est un Initializer. 
 		Vous pouvez passer d'autre paramètres au besoin,
@@ -146,8 +89,10 @@ class NaiveBayes(Classifier):
 		self.validation_data = validation_data
 		self.validation_labels = validation_labels
 		self.tree = tree
+		self.hauteur_max = hauteur_max
+		self.nb_coupe_max = nb_coupe_max
 
-	def train(self, train, train_labels, att_index, default): #vous pouvez rajouter d'autres attributs au besoin
+	def train(self, np_train, np_train_labels, att_index, max_maximum_height, max_nb_val): #vous pouvez rajouter d'autres attributs au besoin
 		"""
 		C'est la méthode qui va entrainer votre modèle,
 		train est une matrice de type Numpy et de taille nxm, avec 
@@ -155,18 +100,45 @@ class NaiveBayes(Classifier):
 		m : le mobre d'attribus (le nombre de caractéristiques)
 		
 		train_labels : est une matrice numpy de taille nx1
+		max_maximum_height : maximum de l'hyper paramètre hauteur
+		max_nb_val : nombre max de valeur possible pour un attribut. affect le nombre 
+					de point d'inflection quand on coupe des valeurs continue en discrètes
 		
 		vous pouvez rajouter d'autres arguments, il suffit juste de
 		les expliquer en commentaire
 		
 		"""
+		#conversion de numpymatrix a list
+		train = np_train.transpose()
+		train = train.tolist()
+		train_labels = np_train_labels.transpose()
+		train_labels = train_labels.tolist()
 		
 		# séparer train en train et validation
-		self.generate_validation(train, train_labels)
+		self.generate_validation(train, train_labels, 0.2)
+
+		#calcule de default pour g/n/rer l'arbre
+		default = max(set(train_labels), key= train_labels.count)
+
+		
 
 		# générer l'Arbre
 		av_length = len(att_index)
-		self.tree = self.build_tree(train, train_labels, att_index, default, [1] * av_length)
+
+		#hyper param
+		evaluations = []
+		for i in range(1, max_maximum_height):
+			self.tree = self.build_tree(self.train_data, self.train_labels, att_index, default, [1] * av_length, i)
+			eval = self.evaluate(self.validation_data, self.validation_labels)
+			evaluations.append(stat.accuracy(eval))
+		
+		val_optimal = -1
+		for i in range(len(evaluations)):
+			if evaluations[i] > val_optimal:
+				val_optimal = evaluations[i]
+				self.hauteur_max = i + 1
+		
+		self.tree = self.build_tree(self.train_data, self.train_labels, att_index, default, [1] * av_length, self.hauteur_max)
 
 		#valider l'arbre
 
@@ -179,11 +151,57 @@ class NaiveBayes(Classifier):
 		Prédire la classe d'un exemple x donné en entrée
 		exemple est de taille 1xm
 		"""
+
+		"""exemple de structure d'arbre pour l'exemple test. 0,2,3 sont les index, e,n,p,w,s sont des valeurs des attributs au index
+		[0, 
+    		[e, 
+				[2, 
+					[e,0],
+					[n,1]
+					]
+				],
+			[n, 1],
+			
+			[p, 
+				[3,
+					[w,1],
+					[s,0]
+				]
+			]
+		]
+		"""
+		answer = None
 		tree = self.tree
-		
+		#tant que j'ai pas trouveer la réponse dans une feuille:
+		while answer == None:
+			if type(tree[1]) == type(tree):
+				#traitement de noeud
+				node_att_index = tree[0] #nous donne l'index de l'attribut a reguarder dans l'arbre
+				x_node_value = x[node_att_index]
+				correct_branche = None
+
+				#pour chaque valeur possible de l'attribut node_att_index, je cherche la bonne branche
+				for i in range(len(tree[1])): 
+					if x_node_value == tree[1][i][0]:
+						correct_branche = i
+						break
+				
+				#changer arbre pour le sous arbre a visité
+				temp_tree = tree[1][correct_branche][1]
+				if type(temp_tree) == type([0,1]):
+					tree = tree[1][correct_branche][1]
+				
+				else: #cas ou on est rendu a une feuille
+					tree = tree[1][correct_branche]
+
+			else:
+				#traitement de feuille
+				answer = tree[1]
+				
+		return answer
         
 
-	def evaluate(self, X, y, labels):
+	def evaluate(self, X, y):
 		"""
 		c'est la méthode qui va evaluer votre modèle sur les données X
 		l'argument X est une matrice de type Numpy et de taille nxm, avec 
@@ -195,30 +213,56 @@ class NaiveBayes(Classifier):
 		vous pouvez rajouter d'autres arguments, il suffit juste de
 		les expliquer en commentaire
 		"""
-		return super().evaluate(X, y, labels)
+		matrice = np.array(X)
+		matrice = matrice.transpose()
+		bels = np.array(y)
+
+		labels = np.unique(np.concatenate((self.train_labels, y)))
+
+		confusion_matrix = {l: {l: 0 for l in labels} for l in labels}
+		for i in range(len(matrice)):
+			exemple = []
+			for j in range(len(X)):
+				exemple.append(X[j][i])
+			prediction = self.predict(exemple)
+			confusion_matrix[prediction][bels[i]] += 1
+		return confusion_matrix
 
 
-	def generate_validation(self, train, train_labels):
+	def generate_validation(self, train, train_labels, percentage):
 		"""
 		méthode qui permet de crée validation et validation_labels
 		en retirant un sous ensemble de train et train_labels  
 		"""
 		self.train_data = []
+		for i in range(len(train)):
+			self.train_data.append([])
 		self.train_labels = []
 		self.validation_data = []
+		for i in range(len(train)):
+			self.validation_data.append([])
 		self.validation_labels = []
 
-		one_tenth = 0.1 * len(train)
+		#en fait one_tenth n'est pas le nombre de cas représentant 1/10, mais bien selon la variable percentage
+		one_tenth = round(percentage * len(train_labels))
 
-		#mettre les premier 90% dans train
-		for i in range (len(train) - one_tenth):
-			self.train_data.append(self.train_data[i])
-			self.train_labels.append(self.train_labels[i])
+		#mélanger l'ordre
+		rand_order = list(range(0, len(train_labels)))
+		random.shuffle(rand_order)
+		rand_order1 = rand_order[0 : (len(train_labels) - one_tenth)]
+		rand_order2 = rand_order[(len(train_labels) - one_tenth) : len(train_labels)]
+
+		#mettre les premier percentage % dans train
+		for i in rand_order1:
+			for j in range(len(train)):
+				self.train_data[j].append(train[j][i])
+			self.train_labels.append(train_labels[i])
 		
-		#mettre les 10% dernier dans validation
-		for i in range(len(train) - one_tenth, len(train)):
-			self.validation_data.append(self.train_data[i])
-			self.validation_labels.append(self.train_labels[i])
+		#mettre les 100 - percentage*100 % dernier dans validation
+		for i in rand_order1:
+			for j in range(len(train)):
+				self.validation_data[j].append(train[j][i])
+			self.validation_labels.append(train_labels[i])
 			
 	
 	def get_frequencies(self, data_array):
@@ -239,14 +283,86 @@ class NaiveBayes(Classifier):
 		return frequencies
 
 
-	def build_tree(self, train, train_labels, att_index, default, av_index):
+	def build_tree(self, train, train_labels, att_index, default, av_index, height):
 		"""
 		construire l'arbre de décision a l'aide d'appel récursifes
 
 		train: l'ensemble d'exemples dans un array d'array
 		train_labels: array des labels pour les exemples
 		att_index: un array de l'index des attributs disponible
-		av_index
+		av_index: les index qui sont encore disponnible
+		av_ex_index: les index des liste d'exemples encore disponible (car en enlève des exemples)
+		default: la valeur par défaut a retourner
+		"""
+		av_att = 0
+		for av in av_index:
+			if av == 1:
+				av_att += 1
+		if len(train) == 0 : 
+			return default
+		elif len(self.get_frequencies(train_labels)) == 1 :
+			return train_labels[0]
+		elif (av_att == 0) or (height == 0):
+			return self.majority_value(train_labels)
+		else:
+			diminished_index = []
+			for i in range(len(av_index)):
+				if av_index[i] == 1:
+					diminished_index.append(att_index[i])
+
+			best_att = self.choose_attribut(diminished_index, train_labels, train)
+			best_att_diminished_index = diminished_index.index(best_att)
+			temps_position = -1
+			for i in range(len(av_index)) :
+				if av_index[i] == 1:
+					temps_position += 1
+				if temps_position == best_att_diminished_index:
+					best_att_index = i
+					break
+			
+			best_att_array = train[best_att_index]
+			best_att_freq = self.get_frequencies(best_att_array)
+			tree = [best_att_index]
+			majority = self.majority_value(train_labels)
+			new_av_index = av_index.copy()
+			for i in range(len(att_index)):
+				if att_index[i] == att_index[best_att_index]:
+					new_av_index[i] = 0
+			branches = []
+					
+			for p_value in best_att_freq: 
+				# obtenir les arrays des exemples updater avec la valeur = de lattribut = p_value
+				temp_train = []
+				for i in range(len(att_index)):
+					temp_train.append([])
+				temp_labels = [] 
+				for i in range(len(train[best_att_index])):
+					if best_att_array[i] == p_value :
+						for j in range(len(att_index)):
+							temp_train[j].append(train[j][i])
+						temp_labels.append(train_labels[i])
+			
+				#crée le sous arbre
+				sub_tree = self.build_tree(temp_train, temp_labels, att_index, majority, new_av_index, height - 1)
+
+				#ajouter les branches avec sub_tree
+				branche = [p_value, sub_tree]
+				branches.append(branche)
+			
+			tree.append(branches)
+			
+			return tree
+
+	
+	def build_tree_old(self, train, train_labels, att_index, default, av_index):
+		"""
+		construire l'arbre de décision a l'aide d'appel récursifes
+
+		train: l'ensemble d'exemples dans un array d'array
+		train_labels: array des labels pour les exemples
+		att_index: un array de l'index des attributs disponible
+		av_index: les index qui sont encore disponnible
+		av_ex_index: les index des liste d'exemples encore disponible (car en enlève des exemples)
 		default: la valeur par défaut a retourner
 		"""
 		av_att = 0
@@ -279,21 +395,21 @@ class NaiveBayes(Classifier):
 			best_att_freq = self.get_frequencies(best_att_array)
 			tree = [best_att_index]
 			majority = self.majority_value(train_labels)
-			new_av_index = av_index
+			new_av_index = av_index.copy()
 			for i in range(len(att_index)):
 				if att_index[i] == att_index[best_att_index]:
 					new_av_index[i] = 0
 			branches = []
 					
-			for p_value in best_att_array:
+			for p_value in best_att_freq: 
 				# obtenir les arrays des exemples updater avec la valeur = de lattribut = p_value
 				temp_train = []
-				for i in range(av_att):
+				for i in range(len(att_index)):
 					temp_train.append([])
 				temp_labels = [] 
 				for i in range(len(train[best_att_index])):
 					if best_att_array[i] == p_value :
-						for j in range(av_att):
+						for j in range(len(att_index)):
 							temp_train[j].append(train[j][i])
 						temp_labels.append(train_labels[i])
 			
@@ -333,7 +449,7 @@ class NaiveBayes(Classifier):
 		attributes_gain_ratio = {} # dictionnaire ayant le gain ratio pour chaque attribut
 		
 		for attribute in attributes: #remplis le dictionnaire
-			attribute_data_array = attributes_data_matrice[attribute]
+			attribute_data_array = attributes_data_matrice[attributes.index(attribute)]
 			gain_ratio = self.get_gain_ratio(labels_data, attribute_data_array)
 			attributes_gain_ratio[attribute] = gain_ratio
 
@@ -356,8 +472,11 @@ class NaiveBayes(Classifier):
 		temp_sum = 0
 		for key in attribute_frequencies:
 			fraction = attribute_frequencies[key] / len(labels_data)
-			temp_sum += fraction * math.log2(fraction)
-
+			if fraction == 1.0:
+				return gain
+			else: 
+				temp_sum += fraction * math.log2(fraction)
+		
 		split_information = 0 - temp_sum
 
 		return gain / split_information
@@ -448,6 +567,10 @@ class NaiveBayes(Classifier):
 
 		return entropie
 
+	def réduire_nb_valeur(self, train, train_labels):
+		redecued_array = []
+		return 
+
 """" #get_label_entropy
 bells = ["baba", "bobo", "baba", "baba", "bobo", "baba", "baba", "bobo", "baba", "baba", "bobo", "baba", "baba", "bobo"]
 b = NaiveBayes()
@@ -491,8 +614,8 @@ x = b.choose_attribut(indexes, bells, matrice)
 print(x)
 """
 
-
-""" #build_tree
+"""
+#build_tree and predit
 att1 = ['e', 'e', 'n', 'p', 'p', 'p', 'n', 'e', 'e', 'p', 'e', 'n', 'n', 'p'] #ciel
 att2 = ['c', 'c', 'c', 't', 'f', 'f', 'f', 't', 'f', 't', 't', 't', 'c', 't'] #temp
 att3 = ['e', 'e', 'e', 'e', 'n', 'n', 'n', 'e', 'n', 'n', 'n', 'e', 'n', 'e'] #humidite
@@ -501,4 +624,52 @@ matrice = [att1, att2, att3, att4]
 bells = [0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0] #jouerTennis
 indexes = [0,1,2,3]
 b = NaiveBayes()
-x = b.build_tree(matrice, bells, indexes, bells[0], [1,1,1,1]) """
+x = b.build_tree(matrice, bells, indexes, bells[0], [1,1,1,1])
+print(type(x))
+y = type(x)
+print(type(y))
+print(type(x[1]))
+test1 = ['n', 'c', 'e', 'w']
+test2 = ['e', 'c', 'e', 'w']
+test3 = ['e', 'c', 'n', 'w']
+test4 = ['p', 'c', 'e', 'w']
+test5 = ['p', 'c', 'e', 's']
+b.tree = x
+print(b.predict(test1))
+print(b.predict(test2))
+print(b.predict(test3))
+print(b.predict(test4))
+print(b.predict(test5))
+"""
+
+"""
+#train
+att1 = ['e', 'e', 'n', 'p', 'p', 'p', 'n', 'e', 'e', 'p', 'e', 'n', 'n', 'p'] #ciel
+att2 = ['c', 'c', 'c', 't', 'f', 'f', 'f', 't', 'f', 't', 't', 't', 'c', 't'] #temp
+att3 = ['e', 'e', 'e', 'e', 'n', 'n', 'n', 'e', 'n', 'n', 'n', 'e', 'n', 'e'] #humidite
+att4 = ['w', 's', 'w', 'w', 'w', 's', 's', 'w', 'w', 'w', 's', 's', 'w', 's'] #vent
+matrice = [att1, att2, att3, att4]
+bells = [0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0] #jouerTennis
+indexes = [0,1,2,3]
+b = NaiveBayes()
+b.train(matrice, bells, indexes,max(set(bells), key= bells.count))
+"""
+
+"""
+#evaluate
+att1 = ['e', 'e', 'n', 'p', 'p', 'p', 'n', 'e', 'e', 'p', 'e', 'n', 'n', 'p'] #ciel
+att2 = ['c', 'c', 'c', 't', 'f', 'f', 'f', 't', 'f', 't', 't', 't', 'c', 't'] #temps
+att3 = ['e', 'e', 'e', 'e', 'n', 'n', 'n', 'e', 'n', 'n', 'n', 'e', 'n', 'e'] #humidite
+att4 = ['w', 's', 'w', 'w', 'w', 's', 's', 'w', 'w', 'w', 's', 's', 'w', 's'] #vent
+matrice = np.array([att1, att2, att3, att4])
+matrice = matrice.transpose()
+bells = np.array([0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0]) #jouerTennis
+bells = bells.transpose()
+indexes = [0,1,2,3]
+b = ArbreDecision()
+b.train(matrice, bells, indexes, 10, 10)
+test = b.evaluate(b.validation_data, b.validation_labels) #['ciel', 'temps', 'humidité', "vent"])
+stat.print_stats(test)
+print("ok")
+"""
+
