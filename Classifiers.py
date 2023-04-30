@@ -8,9 +8,9 @@ vous pouvez rajouter d'autres méthodes qui peuvent vous etre utiles, mais la co
 se fera en utilisant les méthodes train, predict et evaluate de votre code.
 """
 
+from abc import ABC, abstractmethod
 import numpy as np
 import math
-from abc import ABC, abstractmethod
 import random
 import statistiques as stat # importer les fonctions de calcul des métriques REMOVE
 
@@ -637,14 +637,19 @@ class ArbreDecision(Classifier):
 
 class NeuralNet(Classifier):
     
-	def __init__(self, k, train_data=None, train_labels=None):
-		"""
-		C'est un Initializer. 
-		Vous pouvez passer d'autre paramètres au besoin,
-		c'est à vous d'utiliser vos propres notations
-		"""
+	def __init__(self, widht=10, max_iter=1000, learning_rate=0.1):
+		self.widht: int = widht # nombre de neurones dans la couche cachée. 10 par défaut
+		self.max_iter: int = max_iter # nombre d'itérations de descente de gradient. 1000 par défaut
+		self.learning_rate: float = learning_rate # taux d'apprentissage. 0.1 par défaut
 
-	def train(self, train, train_labels): #vous pouvez rajouter d'autres attributs au besoin
+		self.trained: bool = False # booléen indiquant si le modèle a été entraîné
+		self.depth: int = 1 # nombre de couches cachées. 1 pour le TP
+		self.w1: np.array = None # array de poids entre la couche d'entrée et la couche cachée
+		self.w2: np.array = None # array (de poids entre la couche cachée et la couche de sortie
+		self.b1: np.array = None # vecteur de biais entre la couche d'entrée et la couche cachée
+		self.b2: np.array = None # vecteur de biais entre la couche cachée et la couche de sortie
+
+	def train(self, train, train_labels, early_stopping_rounds=10, tol=1e-4): #vous pouvez rajouter d'autres attributs au besoin
 		"""
 		C'est la méthode qui va entrainer votre modèle,
 		train est une matrice de type Numpy et de taille nxm, avec 
@@ -657,14 +662,93 @@ class NeuralNet(Classifier):
 		les expliquer en commentaire
 		
 		"""
-		self.train_data = train
+		self.trained = True
+		self.classes = np.unique(train_labels)
+  
+		n, m = train.shape
+		n_classes = len(np.unique(train_labels))
+
+		# 1. Initialisation des poids et des biais
+		self.w1 = np.random.randn(m, self.widht) * 0.01
+		self.w2 = np.random.randn(self.widht, n_classes) * 0.01
+		self.b1 = np.zeros((1, self.widht))
+		self.b2 = np.zeros((1, n_classes))
+
+		# Transformation des étiquettes en représentation one-hot
+		one_hot_labels = np.eye(n_classes)[train_labels.reshape(-1)]
+
+		best_loss = float('inf')
+		no_improvement = 0
+
+		# 2. Boucle d'entraînement
+		for i in range(self.max_iter):
+			loss = 0
+			dw1, dw2, db1, db2 = 0, 0, 0, 0
+
+			for x, y_true in zip(train, one_hot_labels):
+
+				# 2.a. Propagation avant (forward pass)
+				_, (z1, a1, z2, a2) = self.predict(x)
+
+				# 2.b. Calcul de l'erreur
+				error = y_true - a2
+				loss += -np.sum(y_true * np.log(a2 + 1e-9))
+
+				# 2.c. Rétropropagation (backpropagation)
+				da2 = error
+				dz2 = da2 * a2 * (1 - a2)
+				dw2 += np.dot(a1.T, dz2)
+				db2 += np.sum(dz2, axis=0, keepdims=True)
+				da1 = np.dot(dz2, self.w2.T)
+				dz1 = da1 * a1 * (1 - a1)
+				dw1 += np.dot(x.reshape(-1, 1), dz1)
+				db1 += np.sum(dz1, axis=0, keepdims=True)
+
+			# Mise à jour des poids et des biais
+			self.w1 += self.learning_rate * dw1 / n
+			self.w2 += self.learning_rate * dw2 / n
+			self.b1 += self.learning_rate * db1 / n
+			self.b2 += self.learning_rate * db2 / n
+
+			# Calcul de la perte moyenne
+			loss /= n
+
+			# Vérification de la convergence et condition d'arrêt anticipé
+			if abs(best_loss - loss) < tol:
+				no_improvement += 1
+			else:
+				no_improvement = 0
+				best_loss = loss
+
+			if no_improvement >= early_stopping_rounds:
+				print(f"Arrêt anticipé après {i} itérations.")
+				break
+
+			# Affichage de la perte à chaque itération
+			if i % 10 == 0:
+				print(f"Iteration {i}, Loss: {loss}")
+  
 
 	def predict(self, x: np.ndarray):
-			"""
-			Prédire la classe d'un exemple x donné en entrée
-			exemple est de taille 1xm
-			"""
-			# Préconditions
+		"""
+		Prédire la classe d'un exemple x donné en entrée
+		x est un np.array de taille 1*m où m est le nombre de features (le nombre d'attributs)
+		"""
+		if not self.trained:
+			raise Exception("Le modèle n'est pas entrainé. Vous devez d'abord appeler la méthode train.")
+		z1: np.array = np.dot(x, self.w1) + self.b1 # somme pondérée biaisée de la couche cachée
+		a1: np.array = self.sigmoid(z1) # activation de la couche cachée
+		z2: np.array = np.dot(a1, self.w2) + self.b2 # somme pondérée biaisée de la couche cachée
+		a2: np.array = self.sigmoid(z2) # activation de la couche de sortie
+		return (self.classes[np.argmax(a2)], # argmax retourne l'indice de la valeur la plus grande, cet indice correspond à la classe prédite
+          (z1,a1,z2,a2)) # on retourne aussi les valeurs de z1, a1, z2 et a2 pour le calcul du gradient et la rétropropagation
+
+	@staticmethod
+	def sigmoid(z):
+		"""
+		Cette fonction calcule la sigmoide de z
+  		"""
+		return 1 / (1 + np.exp(-z))
 
 
 
