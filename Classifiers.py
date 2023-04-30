@@ -19,17 +19,10 @@ import statistiques as stat # importer les fonctions de calcul des métriques RE
 # DecisionTree pour l'arbre de décision
 # NeuralNet pour le réseau de neurones
 
-class Classifier: #nom de la class à changer
-
-	def __init__(self, **kwargs):
-		"""
-		C'est un Initializer. 
-		Vous pouvez passer d'autre paramètres au besoin,
-		c'est à vous d'utiliser vos propres notations
-		"""
-		
-		
-	def train(self, train, train_labels): #vous pouvez rajouter d'autres attributs au besoin
+class Classifier(ABC): #nom de la class à changer
+	
+	@abstractmethod
+	def train(self, train: np.ndarray, train_labels: np.ndarray): #vous pouvez rajouter d'autres attributs au besoin
 		"""
 		C'est la méthode qui va entrainer votre modèle,
 		train est une matrice de type Numpy et de taille nxm, avec 
@@ -43,15 +36,16 @@ class Classifier: #nom de la class à changer
 		
 		"""
 		pass
-        
-	def predict(self, x):
+    
+	@abstractmethod
+	def predict(self, x: np.ndarray):
 		"""
 		Prédire la classe d'un exemple x donné en entrée
 		exemple est de taille 1xm
 		"""
 		pass
         
-	def evaluate(self, X, y, labels, **kwargs):
+	def evaluate(self, X: np.ndarray, y: np.ndarray, labels: np.ndarray, **kwargs):
 		"""
 		c'est la méthode qui va evaluer votre modèle sur les données X
 		l'argument X est une matrice de type Numpy et de taille nxm, avec 
@@ -74,6 +68,75 @@ class Classifier: #nom de la class à changer
 	
 	# Vous pouvez rajouter d'autres méthodes et fonctions,
 	# il suffit juste de les commenter.
+ 
+class Knn(Classifier):
+	def __init__(self, k, train_data=None, train_labels=None):
+		"""
+		C'est un Initializer. 
+		Vous pouvez passer d'autre paramètres au besoin,
+		c'est à vous d'utiliser vos propres notations
+		"""
+		self.k = k
+		self.train_data = train_data
+		self.train_labels = train_labels
+		self.unique_labels = np.unique(train_labels)
+        
+        
+	def train(self, train, train_labels): #vous pouvez rajouter d'autres attributs au besoin
+		"""
+		C'est la méthode qui va entrainer votre modèle,
+		train est une matrice de type Numpy et de taille nxm, avec 
+		n : le nombre d'exemple d'entrainement dans le dataset
+		m : le nombre d'attributs (le nombre de caractéristiques)
+		
+		train_labels : est une matrice numpy de taille nx1
+		
+		vous pouvez rajouter d'autres arguments, il suffit juste de
+		les expliquer en commentaire
+		
+		"""
+		self.train_data = train
+		self.train_labels = train_labels
+		self.unique_labels = np.unique(train_labels)
+    
+	def predict(self, x, distance_type='euclidean'):
+		"""
+		Prédire la classe d'un exemple x donné en entrée
+		exemple est de taille 1xm
+		"""
+		# Préconditions
+		if self.train_data is None or self.train_labels is None:
+			raise ValueError('Train data or labels not set')
+		if self.k > len(self.train_data):
+			raise ValueError('k is greater than the number of training examples')
+		# Calcul des distances
+		if distance_type == 'euclidean':
+			distances = np.sqrt(np.sum((self.train_data - x)**2, axis=1))
+		elif distance_type == 'manhattan':
+			distances = np.sum(np.abs(self.train_data - x), axis=1)
+		else:
+			raise ValueError('Distance type not recognized')
+		# Prédiction du label
+		k_nearest = np.argsort(distances)[:self.k]
+		k_nearest_labels = self.train_labels[k_nearest].tolist()
+		# return (np.bincount(k_nearest_labels)).argmax()
+		most_frequent_label = max(set(k_nearest_labels), key = k_nearest_labels.count)
+		return most_frequent_label
+        
+	def evaluate(self, X, y, distance_type='euclidean'):
+		"""
+		c'est la méthode qui va evaluer votre modèle sur les données X
+		l'argument X est une matrice de type Numpy et de taille nxm, avec 
+		n : le nombre d'exemple de test dans le dataset
+		m : le mobre d'attribus (le nombre de caractéristiques)
+		
+		y : est une matrice numpy de taille nx1
+		
+		vous pouvez rajouter d'autres arguments, il suffit juste de
+		les expliquer en commentaire
+		"""
+		matrix_labels = np.unique(np.concatenate((self.train_labels, y)))
+		return super().evaluate(X, y, matrix_labels, distance_type=distance_type)
 
 
 class ArbreDecision(Classifier):
@@ -571,6 +634,41 @@ class ArbreDecision(Classifier):
 		redecued_array = []
 		return 
 
+
+class NeuralNet(Classifier):
+    
+	def __init__(self, k, train_data=None, train_labels=None):
+		"""
+		C'est un Initializer. 
+		Vous pouvez passer d'autre paramètres au besoin,
+		c'est à vous d'utiliser vos propres notations
+		"""
+
+	def train(self, train, train_labels): #vous pouvez rajouter d'autres attributs au besoin
+		"""
+		C'est la méthode qui va entrainer votre modèle,
+		train est une matrice de type Numpy et de taille nxm, avec 
+		n : le nombre d'exemple d'entrainement dans le dataset
+		m : le nombre d'attributs (le nombre de caractéristiques)
+		
+		train_labels : est une matrice numpy de taille nx1
+		
+		vous pouvez rajouter d'autres arguments, il suffit juste de
+		les expliquer en commentaire
+		
+		"""
+		self.train_data = train
+
+	def predict(self, x: np.ndarray):
+			"""
+			Prédire la classe d'un exemple x donné en entrée
+			exemple est de taille 1xm
+			"""
+			# Préconditions
+
+
+
+
 """" #get_label_entropy
 bells = ["baba", "bobo", "baba", "baba", "bobo", "baba", "baba", "bobo", "baba", "baba", "bobo", "baba", "baba", "bobo"]
 b = NaiveBayes()
@@ -672,4 +770,6 @@ test = b.evaluate(b.validation_data, b.validation_labels) #['ciel', 'temps', 'hu
 stat.print_stats(test)
 print("ok")
 """
+
+
 
