@@ -20,12 +20,12 @@ TRAIN_RATIO = 0.7
 
 
 # Initialisez/instanciez vos classifieurs avec leurs paramètres
-iris_knn = Classifiers.Knn(k=5)
-wine_knn = Classifiers.Knn(k=5)
-abalone_knn = Classifiers.Knn(k=5)
-#iris_bayes = Classifiers.NaiveBayes()
-#wine_bayes = Classifiers.NaiveBayes()
-#abalone_bayes = Classifiers.NaiveBayes()
+#iris_knn = Classifiers.Knn(k=5)
+#wine_knn = Classifiers.Knn(k=5)
+#abalone_knn = Classifiers.Knn(k=5)
+iris_arbre = Classifiers.DecisionTree()
+wine_arbre = Classifiers.DecisionTree()
+abalone_arbre = Classifiers.DecisionTree()
 
 
 # Charger/lire les datasets
@@ -37,9 +37,10 @@ abalone = dict(zip(keys, load_datasets.load_abalone_dataset(TRAIN_RATIO)))
 
 
 # Entrainez votre classifieur
-iris_knn.train(iris['train'], iris['train_labels'])
-wine_knn.train(wine['train'], wine['train_labels'])
-abalone_knn.train(abalone['train'], abalone['train_labels'])
+#iris_knn.train(iris['train'], iris['train_labels'])
+#wine_knn.train(wine['train'], wine['train_labels'])
+#abalone_knn.train(abalone['train'], abalone['train_labels'])
+iris_arbre.train(iris['train'], iris['train_labels'], list(range(0,len((iris['train'])[0]))), 10, 10, 20)
 
 """
 Après avoir fait l'entrainement, évaluez votre modèle sur 
@@ -70,9 +71,10 @@ IMPORTANT :
 # Tester votre classifieur
 
 print("\n█████████████ K-nearest neighbors avec k=5 et distance euclidienne █████████████\n")
-confusion_iris_knn = iris_knn.evaluate(iris['test'], iris['test_labels'])
-confusion_wine_knn = wine_knn.evaluate(wine['test'], wine['test_labels'])
-confusion_abalone_knn = abalone_knn.evaluate(abalone['test'], abalone['test_labels'])
+#confusion_iris_knn = iris_knn.evaluate(iris['test'], iris['test_labels'])
+#confusion_wine_knn = wine_knn.evaluate(wine['test'], wine['test_labels'])
+#confusion_abalone_knn = abalone_knn.evaluate(abalone['test'], abalone['test_labels'])
+confusion_iris_arbre = iris_arbre.evaluate(iris['test'], iris['test_labels'])
 
 print("IRIS DATASET (multi-classes)")
 stat.print_stats(confusion_iris_knn)
