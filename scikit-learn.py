@@ -3,6 +3,8 @@ Recherche d'hyperparamètres
 """
 
 from sklearn.neural_network import MLPClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
 from load_datasets import *
 from sklearn.metrics import *
 
@@ -124,3 +126,44 @@ for dataset, y_pred in [(iris, iris_label_pred), (wine, wine_label_pred), (abalo
     f1 = f1_score(y_test, y_pred, average='weighted')
     print("F1-score :   ", f1)
 
+
+
+
+# DECISION TREE
+iris_sk_tree = DecisionTreeClassifier(max_depth=3, random_state=42)
+iris_sk_tree.fit(iris['train'], iris['train_labels'])
+
+wine_sk_tree = DecisionTreeClassifier(max_depth=3, random_state=42)
+wine_sk_tree.fit(wine['train'], wine['train_labels'])
+
+abalone_sk_tree = DecisionTreeClassifier(max_depth=3, random_state=42)
+abalone_sk_tree.fit(abalone['train'], abalone['train_labels'])
+
+# Faire des prédictions sur les données de test
+iris_label_pred = iris_sk_tree.predict(iris['test'])
+wine_label_pred = wine_sk_tree.predict(wine['test'])
+abalone_label_pred = abalone_sk_tree.predict(abalone['test'])
+
+# Calculer les métriques
+for dataset, y_pred in [(iris, iris_label_pred), (wine, wine_label_pred), (abalone, abalone_label_pred)]:
+    y_test = dataset['test_labels']
+    # Calculer la matrice de confusion
+    confusion = confusion_matrix(y_test, y_pred)
+    print("\nMatrice de confusion :")
+    print(confusion)
+
+    # Calculer l'exactitude du modèle
+    accuracy = accuracy_score(y_test, y_pred)
+    print("Accuracy :   ", accuracy)
+
+    # Calculer la précision du modèle
+    precision = precision_score(y_test, y_pred, average='weighted')
+    print("Précision :  ", precision)
+    
+    # Calculer le rappel (recall) du modèle
+    recall = recall_score(y_test, y_pred, average='weighted')
+    print("Rappel :     ", recall)
+    
+    # Calculer le F1-score du modèle
+    f1 = f1_score(y_test, y_pred, average='weighted')
+    print("F1-score :   ", f1)

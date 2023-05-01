@@ -40,22 +40,6 @@ abalone = dict(zip(keys, load_datasets.load_abalone_dataset(TRAIN_RATIO)))
 iris_neural.train(iris['train'], iris['train_labels'])
 wine_neural.train(wine['train'], wine['train_labels'])
 abalone_neural.train(abalone['train'], abalone['train_labels'])
-"""
-iris_accuracy = []
-for i in range(len(iris['train'])):
-    data_temp = []
-    labels_temp = []
-    for j in range(0, i + 1):
-        data_temp.append(iris['train'][j])
-        labels_temp.append(iris['train'][j])
-
-    data_subset = np.array(data_temp)
-    labels_subset = np.array(labels_temp)
-    iris_arbre.train(data_subset, labels_subset, list(range(0,len((iris['train'])[0]))), 30, 100000000, 20000000000)
-    confusion_iris_arbre = iris_arbre.evaluate(iris['test'], iris['test_labels'])
-    iris_accuracy.append(stat.accuracy(confusion_iris_arbre))
-print(iris_accuracy)    
-""" 
     
 
 iris_arbre.train(iris['train'], iris['train_labels'], list(range(0,len((iris['train'])[0]))), 30, 100000000, 20000000000)

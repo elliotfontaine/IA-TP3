@@ -7,7 +7,7 @@
 ## Répartition des tâches:
 - **Elliot**: classe `NeuralNet(Classifier)`, `load_dataset.py`, `statistiques.py`, `README.md`, `comparaison-scikit-learn`, rapport PDF, architecture du projet.  
 *TRANSPARENCE*: des outils basés sur l'intelligence artificielle (ChatGPT et Github Copilot) ont été utilisés pour le codage. Le filtre de suggestions de Copilot a été activé pour éviter de plagier du code public.
-- **Adam**: classe `DecisionTree(Classifier)`, rapport PDF
+- **Adam**: classe `DecisionTree(Classifier)`, `README.md`, `comparaison-scikit-learn`, rapport PDF
 
 # Description de l'architecture du projet
 - Les algorithmes de classification sont implémentés dans `Classifiers.py` (lire plus bas).
@@ -23,3 +23,5 @@
 
 ## Difficultés rencontrées:
 - **DecisionTree:** J'ai réussi a implémenter l'hyper paramètre de la hauteur de l'arbre, mais quand j'ai tenté de rajouté la gestion des variables continue et l'hyperparamètre qui gère le nombre de coupe et le nombre de valeur maximum pour une variable, le code a explosé et j'ai du tenté de sauvé ce que je pouvais pour la remise. A cause de manque de la gestion de variables continue, l'abre fait de l'overfitting extrème en plus d'avoir un bug ou il a presque toujours une hauteur de 1 ce qui donne des très mauvais résultat.
+- **NeuralNet:** Mon réseau, s'il tourne, a des performances médiocres. Il classe généralement un nombre trop élevés d'individus dans une certaine classe parmi celles existantes. Les poids ne varient pas beaucoup, et quand on augmente le nombre d'itérations ou le taux d'entrainement, on observe que le 'loss' ne diminue plus mais se remet à augmenter, ce qui est très mauvais signe. Je pense avoir été confronté au problème du 
+'Vanishing Gradiant'
