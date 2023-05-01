@@ -1,6 +1,5 @@
 import load_datasets
 import Classifiers # importer les classes du classifieur bayesien et Knn
-import numpy as np
 #importer d'autres fichiers et classes si vous en avez développés
 import statistiques as stat # importer les fonctions de calcul des métriques
 
@@ -21,9 +20,9 @@ TRAIN_RATIO = 0.7
 
 
 # Initialisez/instanciez vos classifieurs avec leurs paramètres
-#iris_knn = Classifiers.Knn(k=5)
-#wine_knn = Classifiers.Knn(k=5)
-#abalone_knn = Classifiers.Knn(k=5)
+iris_neural = Classifiers.NeuralNet(learning_rate=0.1, max_iter=1000, widht=10)
+wine_neural = Classifiers.NeuralNet(learning_rate=0.1, max_iter=1000, widht=10)
+abalone_neural = Classifiers.NeuralNet(learning_rate=0.1, max_iter=1000, widht=10)
 iris_arbre = Classifiers.DecisionTree()
 wine_arbre = Classifiers.DecisionTree()
 abalone_arbre = Classifiers.DecisionTree()
@@ -34,13 +33,13 @@ keys = ['train', 'train_labels', 'test', 'test_labels']
 iris = dict(zip(keys, load_datasets.load_iris_dataset(TRAIN_RATIO)))
 wine = dict(zip(keys, load_datasets.load_wine_dataset(TRAIN_RATIO)))
 abalone = dict(zip(keys, load_datasets.load_abalone_dataset(TRAIN_RATIO)))
-# print(abalone)
+
 
 
 # Entrainez votre classifieur
-#iris_knn.train(iris['train'], iris['train_labels'])
-#wine_knn.train(wine['train'], wine['train_labels'])
-#abalone_knn.train(abalone['train'], abalone['train_labels'])
+iris_neural.train(iris['train'], iris['train_labels'])
+wine_neural.train(wine['train'], wine['train_labels'])
+abalone_neural.train(abalone['train'], abalone['train_labels'])
 """
 iris_accuracy = []
 for i in range(len(iris['train'])):
@@ -74,42 +73,36 @@ IMPORTANT :
     - le rappel (recall)
     - le F1-score
 """
-# confusion_iris_knn = iris_knn.evaluate(iris['train'], iris['train_labels'])
-# confusion_wine_knn = wine_knn.evaluate(wine['train'], wine['train_labels'])
-# confusion_abalone_knn = abalone_knn.evaluate(abalone['train'], abalone['train_labels'])
+confusion_iris_neural = iris_neural.evaluate(iris['train'], iris['train_labels'])
+confusion_wine_neural = wine_neural.evaluate(wine['train'], wine['train_labels'])
+confusion_abalone_neural = abalone_neural.evaluate(abalone['train'], abalone['train_labels'])
 
-# print("IRIS DATASET (multi-classes)")
-# stat.print_stats(confusion_iris_knn)
-# ""
-# print("WINE DATASET (binaire)")
-# stat.print_stats(confusion_wine_knn, binary=True)
+print("\n█████████████ Réseau de neurones █████████████\n")
+print("IRIS DATASET (multi-classes)")
+stat.print_stats(confusion_iris_neural)
 
-# print("ABALONE DATASET (multi-classes)")
-# stat.print_stats(confusion_abalone_knn)
+print("WINE DATASET (binaire)")
+stat.print_stats(confusion_wine_neural, binary=True)
+
+print("ABALONE DATASET (multi-classes)")
+stat.print_stats(confusion_abalone_neural)
 
 
 
-# Tester votre classifieur
 
-print("\n█████████████ K-nearest neighbors avec k=5 et distance euclidienne █████████████\n")
-#confusion_iris_knn = iris_knn.evaluate(iris['test'], iris['test_labels'])
-#confusion_wine_knn = wine_knn.evaluate(wine['test'], wine['test_labels'])
-#confusion_abalone_knn = abalone_knn.evaluate(abalone['test'], abalone['test_labels'])
+print("\n█████████████ Arbre de décision █████████████\n")
 confusion_iris_arbre = iris_arbre.evaluate(iris['test'], iris['test_labels'])
 confusion_wine_arbre = iris_arbre.evaluate(wine['test'], wine['test_labels'])
 #confusion_abalone_arbre = iris_arbre.evaluate(iris['test'], iris['test_labels'])
 
 
 print("IRIS DATASET (multi-classes)")
-#stat.print_stats(confusion_iris_knn)
 stat.print_stats(confusion_iris_arbre)
 ""
 print("WINE DATASET (binaire)")
-#stat.print_stats(confusion_wine_knn, binary=True)
 stat.print_stats(confusion_wine_arbre)
 
 print("ABALONE DATASET (multi-classes)")
-#stat.print_stats(confusion_abalone_knn)
 #stat.print_stats(confusion_abalone_arbre)
 
 """
