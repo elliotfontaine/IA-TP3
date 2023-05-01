@@ -126,3 +126,14 @@ for dataset, y_pred in [(iris, iris_label_pred), (wine, wine_label_pred), (abalo
     f1 = f1_score(y_test, y_pred, average='weighted')
     print("F1-score :   ", f1)
 
+"""
+#decision tree
+iris_sk_tree = DecisionTreeClassifier(max_depth=3, random_state=42)
+iris_sk_tree.fit(iris['train'], iris['train_labels'])
+
+wine_sk_tree = DecisionTreeClassifier(max_depth=3, random_state=42)
+wine_sk_tree.fit(wine['train'], wine['train_labels'])
+
+abalone_sk_tree = DecisionTreeClassifier(max_depth=3, random_state=42)
+abalone_sk_tree.fit(abalone['train'], abalone['train_labels'])
+"""
