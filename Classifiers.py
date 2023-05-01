@@ -900,7 +900,7 @@ class NeuralNet(Classifier):
 		self.w2 = np.random.randn(self.widht, n_classes) * 0.01
 		self.b1 = np.zeros((1, self.widht))
 		self.b2 = np.zeros((1, n_classes))
-		print(self.w1, self.w2, self.b1, self.b2)
+		# print(self.w1, self.w2, self.b1, self.b2)
 
 		# Transformation des étiquettes en représentation one-hot
 		one_hot_labels = np.eye(n_classes)[train_labels.reshape(-1)]
