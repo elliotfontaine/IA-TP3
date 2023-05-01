@@ -3,6 +3,8 @@ Recherche d'hyperparamètres
 """
 
 from sklearn.neural_network import MLPClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
 from load_datasets import *
 from sklearn.metrics import *
 
