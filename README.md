@@ -19,8 +19,7 @@
 ## Description des classes dans *Classifiers.py*:
 - Classe abstraite `Classifier`: expose trois méthodes `train`, `predict` et `evaluate`. Les deux premières sont abstraites et doivent être implémentées dans les classes filles. La dernière méthode `evaluate` est implémentée et calcule la matrice de confusion sur un jeu de données de test, en utilisant la méthode `predict` pour prédire le label de chaque vecteur de données.
 - Classe `NeuralNet(Classifier)`: implémente les méthodes `train` et `predict` de la classe abstraite `Classifier`. **[...]**
-- Classe `DecisionTree(Classifier)`: implémente les méthodes `train` et `predict` de la classe abstraite `Classifier`. **[...]**
+- Classe `DecisionTree(Classifier)`: implémente les méthodes `train`, `evaluate` et `predict` de la classe abstraite `Classifier`. **[...]**
 
 ## Difficultés rencontrées:
-- **Nature des données:** la conversion des données catégorielles non-binaires pour le K-nn. En particulier, le sexe (mâle, femelle, enfant) du datatset Abalones. On a décidé de convertir {M, I, F} en {O, 1, 2}, même si ca provoque des distances inégales entre les 3. Les résultats restent honorables pour ce dataset (exactitude=81%)
-- **Implémentation du classificateur naïf bayésien:** Des bugs dans la logique de la construction de l'arbre on forcer la réécriture de cette partie avec une nouvelle logique de récursion. Ceci a briser la fonction de création de l'arbre (la fonction plante avant de créer un arbre).
+- **DecisionTree:** J'ai réussi a implémenter l'hyper paramètre de la hauteur de l'arbre, mais quand j'ai tenté de rajouté la gestion des variables continue et l'hyperparamètre qui gère le nombre de coupe et le nombre de valeur maximum pour une variable, le code a explosé et j'ai du tenté de sauvé ce que je pouvais pour la remise. A cause de manque de la gestion de variables continue, l'abre fait de l'overfitting extrème en plus d'avoir un bug ou il a presque toujours une hauteur de 1 ce qui donne des très mauvais résultat.
