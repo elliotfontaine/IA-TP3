@@ -40,7 +40,17 @@ abalone = dict(zip(keys, load_datasets.load_abalone_dataset(TRAIN_RATIO)))
 #iris_knn.train(iris['train'], iris['train_labels'])
 #wine_knn.train(wine['train'], wine['train_labels'])
 #abalone_knn.train(abalone['train'], abalone['train_labels'])
-iris_arbre.train(iris['train'], iris['train_labels'], list(range(0,len((iris['train'])[0]))), 10, 10, 20)
+for i in range(len(iris['train'])):
+    data_temp = []
+    labels_temp = []
+    for j in range(0, i + 1):
+        data_temp.append(iris['train'][j])
+        labels_temp.append(iris['train'][j])
+    
+
+iris_arbre.train(iris['train'], iris['train_labels'], list(range(0,len((iris['train'])[0]))), 30, 100000000, 20000000000)
+wine_arbre.train(wine['train'], wine['train_labels'], list(range(0,len((wine['train'])[0]))), 30, 100000000, 20000000000)
+#abalone_arbre.train(abalone['train'], abalone['train_labels'], list(range(0,len((abalone['train'])[0]))), 30, 100000000, 20000000000)
 
 """
 Après avoir fait l'entrainement, évaluez votre modèle sur 
@@ -75,15 +85,21 @@ print("\n█████████████ K-nearest neighbors avec k=5 et
 #confusion_wine_knn = wine_knn.evaluate(wine['test'], wine['test_labels'])
 #confusion_abalone_knn = abalone_knn.evaluate(abalone['test'], abalone['test_labels'])
 confusion_iris_arbre = iris_arbre.evaluate(iris['test'], iris['test_labels'])
+confusion_wine_arbre = iris_arbre.evaluate(wine['test'], wine['test_labels'])
+#confusion_abalone_arbre = iris_arbre.evaluate(iris['test'], iris['test_labels'])
+
 
 print("IRIS DATASET (multi-classes)")
-stat.print_stats(confusion_iris_knn)
+#stat.print_stats(confusion_iris_knn)
+stat.print_stats(confusion_iris_arbre)
 ""
 print("WINE DATASET (binaire)")
-stat.print_stats(confusion_wine_knn, binary=True)
+#stat.print_stats(confusion_wine_knn, binary=True)
+stat.print_stats(confusion_wine_arbre)
 
 print("ABALONE DATASET (multi-classes)")
-stat.print_stats(confusion_abalone_knn)
+#stat.print_stats(confusion_abalone_knn)
+#stat.print_stats(confusion_abalone_arbre)
 
 """
 Finalement, évaluez votre modèle sur les données de test.

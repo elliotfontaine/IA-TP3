@@ -174,9 +174,37 @@ class DecisionTree(Classifier):
 		les expliquer en commentaire
 		
 		"""
+		#conversion de numpymatrix a list
+		train = np_train.transpose()
+		train = train.tolist()
+		train_labels = np_train_labels.transpose()
+		train_labels = train_labels.tolist()
 		
+		# séparer train en train et validation
+		self.generate_validation(train, train_labels, 0.2)
 
+		#calcule de default pour g/n/rer l'arbre
+		default = max(set(train_labels), key= train_labels.count)		
 
+		# générer l'Arbre
+		av_length = len(att_index)
+
+		#hyper param
+		evaluations = []
+		evaluations = []
+		for i in range(1, max_maximum_height + 1):
+			self.tree = self.build_tree(self.train_data, self.train_labels, att_index, default, [1] * av_length, i)
+			eval = self.evaluate(self.validation_data, self.validation_labels)
+			evaluations.append(stat.accuracy(eval))
+
+		val_optimal = -1
+		for i in range(len(evaluations)):
+			if evaluations[i] > val_optimal:
+				val_optimal = evaluations[i]
+				self.hauteur_max = i + 1
+		
+		self.tree = self.build_tree(self.train_data, self.train_labels, att_index, default, [1] * av_length, self.hauteur_max)
+		"""
 		#conversion de numpymatrix a list
 		train = np_train.transpose()
 		train = train.tolist()
@@ -197,11 +225,9 @@ class DecisionTree(Classifier):
 		# générer l'Arbre
 		av_length = len(att_index)
 
-		#hyper param
-		evaluations = []
 		for i in range(1, max_maximum_height + 1 ):
 			evaluations.append([])
-			for j in range(1, max_nb_coupe + 1):
+			for j in range(0, max_nb_coupe + 1):
 				self.nb_coupe = j
 				self.intervales = []
 				for k in range(len(train)):
@@ -212,9 +238,13 @@ class DecisionTree(Classifier):
 				temp_train = self.reduire_nb_valeur(self.train_data, self.train_labels)
 
 				self.tree = self.build_tree(temp_train, self.train_labels, att_index, default, [1] * av_length, i)
-				eval = self.evaluate(self.validation_data, self.validation_labels)
+				vald_data_t = np.array(self.validation_data)
+				vald_data_t = vald_data_t.transpose()
+				vald_labels_t = np.array(self.validation_labels)
+				vald_labels_t = vald_labels_t.transpose()
+				eval = self.evaluate(vald_data_t, vald_labels_t)
 				evaluations[i - 1].append(stat.accuracy(eval))
-			
+		
 		val_optimal = -1
 		for i in range(len(evaluations)):
 			for j in range(len(evaluations[i])):
@@ -224,14 +254,10 @@ class DecisionTree(Classifier):
 					self.nb_coupe = j + 1
 		
 		#generer arbre optimal
-		temp_train = self.reduire_nb_valeur(train, train_labels)
-		self.generate_validation(temp_train, train_labels, 0.2)
-		self.tree = self.build_tree(self.train_data, self.train_labels, att_index, default, [1] * av_length, self.hauteur_max)
-
-		#valider l'arbre
-
-
-		
+		self.generate_validation(train, train_labels, 0.2)
+		temp_train = self.reduire_nb_valeur(self.train_data, self.train_labels)
+		self.tree = self.build_tree(temp_train, self.train_labels, att_index, default, [1] * av_length, self.hauteur_max)
+		"""
 		
 
 	def predict(self, x):
@@ -267,13 +293,23 @@ class DecisionTree(Classifier):
 				node_att_index = tree[0] #nous donne l'index de l'attribut a reguarder dans l'arbre
 				x_node_value = x[node_att_index]
 				correct_branche = None
+				nearest = 0
+				diff = float("inf")
 
 				#pour chaque valeur possible de l'attribut node_att_index, je cherche la bonne branche
 				for i in range(len(tree[1])): 
 					if x_node_value == tree[1][i][0]:
 						correct_branche = i
 						break
+					else:
+						max_val = max(abs(x_node_value), abs(tree[1][i][0]))
+						min_val =  min(abs(x_node_value), abs(tree[1][i][0]))
+						if (max_val - min_val < diff):
+							nearest = i
 				
+				if (correct_branche == None):
+					correct_branche = nearest
+
 				#changer arbre pour le sous arbre a visité
 				temp_tree = tree[1][correct_branche][1]
 				if type(temp_tree) == type([0,1]):
@@ -305,29 +341,45 @@ class DecisionTree(Classifier):
 		matrice = matrice.transpose()
 		bels = np.array(y)
 		
-		
-		#vérifier si il faut réduire et réduire les attributs
-		reduced_train = np.array([])
-		for i in range(len(matrice)):
-			attribute_arr = matrice[i]
-			if self.intervales[i] != float("-inf"):
-					attribute_arr = self.reduire_array(matrice[i], bels, self.intervales[i])
-					
-			reduced_train.append(attribute_arr)
-		
-		reduced_train = reduced_train.transpose()
-		
 		labels = np.unique(np.concatenate((self.train_labels, y)))
 
 		confusion_matrix = {l: {l: 0 for l in labels} for l in labels}
 		for i in range(len(matrice)):
-			exemple = []
-			for j in range(len(X)):
-				exemple.append(X[j][i])
-			prediction = self.predict(exemple)
+			#exemple = []
+			#for j in range(len(X)):
+			#	exemple.append(X[j][i])
+			prediction = self.predict(matrice[i])
 			confusion_matrix[prediction][bels[i]] += 1
 		return confusion_matrix
+		
+		"""
+		#vérifier si il faut réduire et réduire les attributs
+		reduced_train = []
+		for i in range(len(matrice)):
+			attribute_arr = matrice[i]
+			x1 = self.intervales[i][0]
+			if self.intervales[i][0] != float("-inf"):
+					attribute_arr = self.reduire_array(matrice[i], bels, self.intervales[i], True)
+					
+			reduced_train.append(attribute_arr)
 
+		#transofrmer reduced_train en nparray et transposer
+		np_reduced_train = np.array(reduced_train)
+		np_reduced_train = np_reduced_train.transpose()
+
+		
+		
+		labels = np.unique(np.concatenate((self.train_labels, y)))
+
+		confusion_matrix = {l: {l: 0 for l in labels} for l in labels}
+		for i in range(len(np_reduced_train)):
+			#exemple = []
+			#for j in range(len(X)):
+			#	exemple.append(np_reduced_train[i][j])
+			prediction = self.predict(np_reduced_train[i])
+			confusion_matrix[prediction][bels[i]] += 1
+		return confusion_matrix
+		"""
 
 	def generate_validation(self, train, train_labels, percentage):
 		"""
@@ -359,7 +411,7 @@ class DecisionTree(Classifier):
 			self.train_labels.append(train_labels[i])
 		
 		#mettre les 100 - percentage*100 % dernier dans validation
-		for i in rand_order1:
+		for i in rand_order2:
 			for j in range(len(train)):
 				self.validation_data[j].append(train[j][i])
 			self.validation_labels.append(train_labels[i])
@@ -685,16 +737,22 @@ class DecisionTree(Classifier):
 				freqs = self.get_frequencies(train[i])
 				if len(freqs) > self.nb_val_max:
 					#réduire les array au index
-					attribute_max = max(attribute_arr)
-					attribute_arr = self.reduire_array(attribute_arr, train_labels, attribute_max)
+					if self.nb_coupe != 1:
+						attribute_max = [max(attribute_arr)]
+						attribute_arr = self.reduire_array(attribute_arr, train_labels, attribute_max)
+					else:
+						temp_arr = self.reduire_array(attribute_arr, train_labels, 0)
+						attribute_arr = temp_arr[0]
+						attribute_max = [temp_arr[1]]
+					
 					
 					
 			reduced_train.append(attribute_arr)
-			self.intervales[i].append([attribute_max])
+			self.intervales[i] = attribute_max
 		
 		return reduced_train
 
-	def reduire_array(self, attribut_array, train_labels, max_val):
+	def reduire_array(self, attribut_array, train_labels, max_val, index_eval=-1):
 		"""
 		Discrétise les valeurs continue d'un array pour un attribut. Transforme ces valeurs continue en string représentant 
 		des intervales de valerus continue. 
@@ -705,37 +763,50 @@ class DecisionTree(Classifier):
 
 		attribut_array: liste contenant les valeurs continue de l'attribut dans le même ordre que train_labels
 		train_labels: liste des labels.
+		max_val: N'est pas toujours la valeur max, dans le cas de nb_coupe == 1, elle vaut middle du training
+		in_eval: si la fonction est appeler dans la fonction d'évaluation, la valeur est mis a l'index de l'array. 
+			     Utiliser quand nb_coupe == 1
 		"""
+		#cas 0 points de coupe
+		if self.nb_coupe == 0:
+			return attribut_array
+		
 		#cas 1 points de coupe
-		if self.nb_coupe <= 1:
+		elif self.nb_coupe == 1:
 
 			#crée nouveau array de tuple
 			combined = []
+			temp_data = []
+			temp_labels = []
 			for i in range(len(train_labels)):
-				combined.append((attribut_array[i], train_labels[i]))
-
+				temp_data.append(attribut_array[i])
+				temp_labels.append(train_labels[i])
+			combined.append(temp_data)
+			combined.append(temp_labels)
 			#ordonné l'array
 			combined.sort() #car val continue premier élément du tuple, peut utilise default sort
 
 			#caculer les points de coupe et intervales
 			pdc = [] #index des points de coupe
 			intervales = [] #comme combined, mais avec les valeurs remplacer par intervalles
-			for i in range(len(combined) - 1):
-				if combined[i][1] != combined[i+1][1]:
-					middle = (combined[i][0] + combined[i + 1][0]) /  2
+			for i in range(len(combined[0]) - 1):
+				if combined[1][i] != combined[1][i + 1]:
+					middle = (combined[0][i] + combined[0][i + 1]) /  2
+					if (index_eval != -1):
+						middle = self.intervales[index_eval]
 					temp_att_data = []
 					temp_labels_data = []
 					itv_string = None
 					itv_string1 = "]-infini,{}[".format(middle)
 					itv_string2 = "[{}, infini[".format(middle)
-					for j in range(len(combined)):
-						if combined[j][0] < middle:
+					for j in range(len(combined[0])):
+						if combined[0][j] < middle:
 							itv_string = itv_string1
 						else:
 							itv_string = itv_string2
 
 						temp_att_data.append(itv_string)
-						temp_labels_data.append(combined[j][1])
+						temp_labels_data.append(combined[1][j])
 
 					intervales.append(temp_att_data)
 					intervales.append(temp_labels_data)
@@ -747,11 +818,15 @@ class DecisionTree(Classifier):
 				gain_ratio = self.get_gain_ratio(pdc[i][1][1], pdc[i][1][0])
 				gains.append(gain_ratio)
 
-			max_index = gains.index(max(gains))
-			max_pdc = pdc[max_index]
+			if len(pdc) != 0:
+				max_index = gains.index(max(gains))
+				max_pdc = pdc[max_index]
+				#transformer valeurs dans array
+				return (max_pdc[1][0], float("-inf"))
+			else:
+				return (attribut_array, middle)
 
-			#transformer valeurs dans array
-			return max_pdc[1][0]
+			
 
 		#cas range buckets
 		else: 
@@ -1057,10 +1132,14 @@ matrice = np.array([arr1, arr2, arr3])
 matrice = matrice.transpose()
 bels = np.array([0, 1, 0, 1, 0, 1])
 bels = bels.transpose()
-b = ArbreDecision()
+b = DecisionTree()
 indexes = [0,1,2]
-b.train(matrice, bels, indexes, 10, 2, 5)
-test = b.evaluate(b.validation_data, b.validation_labels)
+b.train(matrice, bels, indexes, 10, 2, 2)
+temp_val1 = np.array(b.validation_data)
+temp_val1 = temp_val1.transpose()
+temp_val2 = np.array(b.validation_labels)
+temp_val2 = temp_val2.transpose()
+test = b.evaluate(temp_val1, temp_val2)
 stat.print_stats(test)
 """
 
